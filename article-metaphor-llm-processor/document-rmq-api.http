@@ -1,0 +1,126 @@
+## Publish to `article` exchange - test 1
+
+POST http://localhost:15672/api/exchanges/%2f/x.article/publish
+Authorization: Basic metaphorai:M3T4Ph0841
+Content-Type: application/json
+
+{
+  "vhost": "/",
+  "properties": {
+  },
+  "routing_key": "",
+  "payload": "{\"source\":\"https://www.theguardian.com/society/2025/apr/24/wales-and-north-of-england-face-disability-cuts-double-whammy\", \"origin\":\"GUARDIAN\"}",
+  "headers": {},
+  "payload_encoding": "string"
+}
+
+
+###
+POST http://localhost:15672/api/exchanges/%2f/x.article/publish
+Authorization: Basic metaphorai:M3T4Ph0841
+Content-Type: application/json
+
+{
+  "vhost": "/",
+  "properties": {
+  },
+  "routing_key": "",
+  "payload": "{\"source\":\"https://www.theguardian.com/society/2025/sep/06/uk-mobile-phones-test-emergency-alert-sunday\", \"origin\":\"GUARDIAN\"}",
+  "headers": {},
+  "payload_encoding": "string"
+}
+
+
+###
+POST http://localhost:15672/api/exchanges/%2f/x.article/publish
+Authorization: Basic metaphorai:M3T4Ph0841
+Content-Type: application/json
+
+{
+  "vhost": "/",
+  "properties": {
+  },
+  "routing_key": "",
+  "payload": "{\"source\":\"https://www.independent.co.uk/news/uk/home-news/pip-changes-dwp-assessment-labour-kendall-b2749877.html\", \"origin\":\"INDEPENDENT\"}",
+  "headers": {},
+  "payload_encoding": "string"
+}
+
+###
+POST http://localhost:15672/api/exchanges/%2f/x.article/publish
+Authorization: Basic metaphorai:M3T4Ph0841
+Content-Type: application/json
+
+{
+  "vhost": "/",
+  "properties": {
+  },
+  "routing_key": "",
+  "payload": "{\"source\":\"https://www.independent.co.uk/voices/covid-lockdown-disabled-rights-disability-b1780301.html\", \"origin\":\"INDEPENDENT\"}",
+  "headers": {},
+  "payload_encoding": "string"
+}
+
+
+
+###
+POST http://localhost:15672/api/exchanges/%2f/x.article/publish
+Authorization: Basic metaphorai:M3T4Ph0841
+Content-Type: application/json
+
+{
+  "vhost": "/",
+  "properties": {
+  },
+  "routing_key": "",
+  "payload": "{\"source\":\"https://www.usatoday.com/story/opinion/voices/2025/08/12/medicaid-cuts-disabled-people-caregivers/85566307007/\", \"origin\":\"USA_TODAY\"}",
+  "headers": {},
+  "payload_encoding": "string"
+}
+
+###
+POST http://localhost:15672/api/exchanges/%2f/x.article/publish
+Authorization: Basic metaphorai:M3T4Ph0841
+Content-Type: application/json
+
+{
+  "vhost": "/",
+  "properties": {
+  },
+  "routing_key": "",
+  "payload": "{\"source\":\"https://www.usatoday.com/story/life/health-wellness/2025/07/29/family-caregivers-suicidal-ideation-higher-rates/85272214007/\", \"origin\":\"USA_TODAY\"}",
+  "headers": {},
+  "payload_encoding": "string"
+}
+
+
+###
+POST http://localhost:15672/api/exchanges/%2f/x.article/publish
+Authorization: Basic metaphorai:M3T4Ph0841
+Content-Type: application/json
+
+{
+  "vhost": "/",
+  "properties": {
+  },
+  "routing_key": "",
+  "payload": "{\"source\":\"https://www.dailymail.co.uk/wires/pa/article-14703895/Review-Pip-disability-benefits-way-minister-says.html\", \"origin\":\"DAILY_MAIL\"}",
+  "headers": {},
+  "payload_encoding": "string"
+}
+
+
+###
+POST http://localhost:15672/api/exchanges/%2f/x.article/publish
+Authorization: Basic metaphorai:M3T4Ph0841
+Content-Type: application/json
+
+{
+  "vhost": "/",
+  "properties": {
+  },
+  "routing_key": "",
+  "payload": "{\"source\":\"https://www.dailymail.co.uk/wires/pa/article-14403353/Film-industry-needs-stop-seeing-disability-risk--A-Different-Man-star.html\", \"origin\":\"DAILY_MAIL\"}",
+  "headers": {},
+  "payload_encoding": "string"
+}

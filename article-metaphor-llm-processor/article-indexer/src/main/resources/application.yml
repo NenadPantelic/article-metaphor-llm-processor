@@ -1,0 +1,28 @@
+spring:
+  application:
+    name: article-indexer
+
+  data:
+    mongodb:
+      authentication-database: admin
+      username: metaphorai-db-user
+      password: metaphorai-db-password
+      database: metaphorai
+      port: 27017
+      host: localhost
+      config:
+        enabled: true
+        write:
+          writeConcern:
+            isMajority: true
+          timeout:
+            milliseconds: 100000
+  rabbitmq:
+    addresses: "localhost:5672"
+    username: metaphorai
+    password: M3T4Ph0841
+
+indexing:
+  max-retry: 3
+  retry-interval-in-millis: 30000
+  queue: q.article

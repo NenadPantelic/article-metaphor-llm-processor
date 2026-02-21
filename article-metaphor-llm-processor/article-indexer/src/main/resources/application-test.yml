@@ -1,0 +1,56 @@
+spring:
+  application:
+    name: metaphor-llm-processor
+
+  ai:
+    openai:
+      api-key: ${OPENAI_API_KEY}
+      chat:
+        options:
+          model: gpt-4o
+    retry:
+      max-attempts: 10
+      backoff:
+        initial-interval: 2000 # 2 seconds
+        multiplier: 5
+        max-interval: 180000 # 3 minutes
+      on-http-codes: 429, 502, 503
+
+  data:
+    mongodb:
+      authentication-database: admin
+      username: metaphorai-db-user
+      password: metaphorai-db-password
+      database: metaphorai
+      port: 27017
+      host: localhost
+      config:
+        enabled: true
+        write:
+          writeConcern:
+            isMajority: true
+          timeout:
+            milliseconds: 100000
+  rabbitmq:
+    addresses: "localhost:5672"
+    username: metaphorai
+    password: M3T4Ph0841
+
+metaphor:
+  system-prompt: You are a linguist, an expert for metaphor in English.
+  reprocessing-directive: |
+  I'm not satisfied with how you analyzed this chunk last time. This time, please be sure to:
+    - use the correct word class
+    - consult the selected dictionaries
+    - establish the correct basic sense of words
+    - establish the correct contextual sense of words
+
+indexing:
+  max-retry: 3
+  retry-interval-in-millis: 30000
+  queue: q.article
+
+processing:
+  max-retry: 3
+  interval-in-millis: 60000 # 1 minute
+  reprocessing-queue: q.article-reprocessing
