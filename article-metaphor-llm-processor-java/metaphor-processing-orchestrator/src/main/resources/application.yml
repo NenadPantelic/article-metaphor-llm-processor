@@ -1,0 +1,31 @@
+spring:
+  application:
+    name: metaphor-processing-orchestrator
+
+  data:
+    mongodb:
+      authentication-database: admin
+      username: metaphorai-db-user
+      password: metaphorai-db-password
+      database: metaphorai
+      port: 27017
+      host: localhost
+      config:
+        enabled: true
+        write:
+          writeConcern:
+            isMajority: true
+          timeout:
+            milliseconds: 100000
+  rabbitmq:
+    addresses: "localhost:5672"
+    username: metaphorai
+    password: M3T4Ph0841
+
+processing:
+  max-retry: 3
+  interval-in-millis: 60000 # 1 minute
+  lexical-unit-processing-exchange: x.lexical-unit-processing
+
+reprocessing:
+  reprocessing-queue: q.article-reprocessing

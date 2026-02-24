@@ -1,0 +1,18 @@
+server:
+  port: 9081
+
+spring:
+  application:
+    name: document-api
+
+  data:
+    mongodb:
+      authentication-database: admin
+      # TODO: create a separate user
+      username: metaphorai-db-user
+      password: metaphorai-db-password
+      database: metaphorai
+      port: 27017
+      host: localhost
+      config:
+        enabled: true
