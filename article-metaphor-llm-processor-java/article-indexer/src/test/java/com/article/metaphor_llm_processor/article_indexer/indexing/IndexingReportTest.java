@@ -1,7 +1,7 @@
 package com.article.metaphor_llm_processor.article_indexer.indexing;
 
-import ai.metaphor.metaphor_llm_processor.model.DocumentChunkStatus;
-import ai.metaphor.metaphor_llm_processor.model.IndexedDocumentChunk;
+import com.article.metaphor_llm_processor.common.model.DocumentChunkStatus;
+import com.article.metaphor_llm_processor.common.model.IndexedDocumentChunk;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -24,7 +24,7 @@ class IndexingReportTest {
         var now = Instant.now();
         var chunk = new IndexedDocumentChunk(
                 "test-id-1", "test-document-id-1", "Test 1234567890", DocumentChunkStatus.PENDING, 1,
-                null, now, now, now
+                null, now, now, now, false
         );
 
         var indexingReport = new IndexingReport(
@@ -38,7 +38,7 @@ class IndexingReportTest {
         var now = Instant.now();
         var chunk = new IndexedDocumentChunk(
                 "test-id-1", "test-document-id-1", "Test 1234567890", DocumentChunkStatus.PENDING, 1,
-                null, now, now, now
+                null, now, now, now, false
         );
 
         var indexingReport = new IndexingReport(List.of(chunk), null, true);
@@ -51,7 +51,7 @@ class IndexingReportTest {
         var now = Instant.now();
         var chunk = new IndexedDocumentChunk(
                 "test-id-1", "test-document-id-1", "Test 1234567890", DocumentChunkStatus.PENDING, 1,
-                null, now, now, now
+                null, now, now, now, false
         );
 
         var indexingReport = new IndexingReport(
@@ -66,7 +66,7 @@ class IndexingReportTest {
         var now = Instant.now();
         var chunk = new IndexedDocumentChunk(
                 "test-id-1", "test-document-id-1", "Test 1234567890", DocumentChunkStatus.PENDING, 1,
-                null, now, now, now
+                null, now, now, now, false
         );
 
         var indexingReport = new IndexingReport(

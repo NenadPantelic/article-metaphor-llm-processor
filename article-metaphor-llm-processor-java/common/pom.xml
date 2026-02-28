@@ -8,13 +8,15 @@
         <artifactId>article-metaphor-llm-processor-java</artifactId>
         <version>0.0.1-SNAPSHOT</version>
     </parent>
-
+    <!--    https://medium.com/@mayintuji/exclude-itself-referencing-into-multimodule-maven-project-b3391ac510e5-->
+    <packaging>jar</packaging>
     <artifactId>common</artifactId>
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <spring-boot.repackage.skip>true</spring-boot.repackage.skip>
     </properties>
 
 </project>

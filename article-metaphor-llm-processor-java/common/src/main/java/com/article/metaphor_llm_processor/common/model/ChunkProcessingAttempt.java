@@ -1,4 +1,4 @@
-package com.article.metaphor_llm_processor.orchestrator.model;
+package com.article.metaphor_llm_processor.common.model;
 
 import com.article.metaphor_llm_processor.common.model.DocumentChunkStatus;
 

@@ -43,6 +43,8 @@ public class IndexedDocumentChunk {
     private Instant updatedAt;
     // to check stuck chunks
     private Instant lastProcessingAttemptedAt;
+    @Builder.Default
+    private boolean shouldBeReprocessed = false;
 
     public void addAttempt(ChunkProcessingAttempt chunkProcessingAttempt) {
         this.attempts.add(chunkProcessingAttempt);

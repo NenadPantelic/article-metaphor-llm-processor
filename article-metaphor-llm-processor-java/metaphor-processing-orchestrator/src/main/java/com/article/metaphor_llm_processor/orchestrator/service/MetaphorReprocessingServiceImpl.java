@@ -1,13 +1,13 @@
 package com.article.metaphor_llm_processor.orchestrator.service;
 
-import com.metaphor.llm.processor.dto.metaphor.MetaphorReprocessingRequest;
-import com.metaphor.llm.processor.model.DocumentChunkStatus;
-import com.metaphor.llm.processor.model.DocumentReprocessingRequest;
-import com.metaphor.llm.processor.model.DocumentStatus;
-import com.metaphor.llm.processor.model.IndexedDocument;
-import com.metaphor.llm.processor.repository.DocumentReprocessingRequestRepository;
-import com.metaphor.llm.processor.repository.IndexedDocumentChunkRepository;
-import com.metaphor.llm.processor.repository.IndexedDocumentRepository;
+import com.article.metaphor_llm_processor.orchestrator.dto.reprocessing.MetaphorReprocessingRequest;
+import com.article.metaphor_llm_processor.common.model.DocumentStatus;
+import com.article.metaphor_llm_processor.common.model.DocumentChunkStatus;
+import com.article.metaphor_llm_processor.common.model.IndexedDocument;
+import com.article.metaphor_llm_processor.common.repository.IndexedDocumentRepository;
+import com.article.metaphor_llm_processor.common.repository.IndexedDocumentChunkRepository;
+import com.article.metaphor_llm_processor.orchestrator.model.DocumentReprocessingRequest;
+import com.article.metaphor_llm_processor.orchestrator.repository.DocumentReprocessingRequestRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 

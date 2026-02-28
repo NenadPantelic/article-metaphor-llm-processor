@@ -38,13 +38,13 @@ class DocumentIndexingConsumerTest {
         var articleUrl = new Article("test-source", "test-origin");
 
         var now = Instant.now();
+
         var documentChunkOne = new IndexedDocumentChunk(
-                "test-id-1", "test-document-id-1", "Test 1234567890", DocumentChunkStatus.PENDING, 1,
-                null, now, now, now
-        );
+                "test-id-1", "test-document-id-1", "Test 1234567890",
+                DocumentChunkStatus.PENDING, 1, null, now, now, now, false);
         var documentChunkTwo = new IndexedDocumentChunk(
                 "test-id-2", "test-document-id-2", "Test 0987654321", DocumentChunkStatus.PENDING, 2,
-                null, now, now, now
+                null, now, now, now, false
         );
         List<IndexedDocumentChunk> chunks = List.of(documentChunkOne, documentChunkTwo);
         IndexingReport indexingReport = new IndexingReport(chunks, null, false);

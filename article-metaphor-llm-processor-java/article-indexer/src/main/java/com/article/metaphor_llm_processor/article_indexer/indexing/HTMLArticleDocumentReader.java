@@ -1,6 +1,5 @@
 package com.article.metaphor_llm_processor.article_indexer.indexing;
 
-import com.article.metaphor_llm_processor.api.article_indexer.indexing.filter.*;
 import com.article.metaphor_llm_processor.common.model.Origin;
 import com.article.metaphor_llm_processor.article_indexer.indexing.filter.*;
 import lombok.extern.slf4j.Slf4j;

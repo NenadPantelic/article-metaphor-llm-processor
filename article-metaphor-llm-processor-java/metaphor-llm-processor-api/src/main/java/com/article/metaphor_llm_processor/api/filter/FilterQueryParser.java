@@ -1,6 +1,6 @@
 package com.article.metaphor_llm_processor.api.filter;
 
-import ai.metaphor.document_api.exception.FilterException;
+import com.article.metaphor_llm_processor.api.exception.FilterException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.PageRequest;

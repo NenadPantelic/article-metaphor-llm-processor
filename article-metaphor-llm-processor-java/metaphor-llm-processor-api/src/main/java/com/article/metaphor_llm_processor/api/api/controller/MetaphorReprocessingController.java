@@ -1,7 +1,7 @@
 package com.article.metaphor_llm_processor.api.api.controller;
 
-import ai.metaphor.document_api.api.service.MetaphorReprocessingService;
-import ai.metaphor.document_api.dto.request.MetaphorReprocessingRequest;
+import com.article.metaphor_llm_processor.api.service.MetaphorReprocessingService;
+import com.article.metaphor_llm_processor.api.dto.request.MetaphorReprocessingRequest;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -22,6 +22,6 @@ public class MetaphorReprocessingController {
     @ResponseStatus(HttpStatus.ACCEPTED)
     public void handleReprocessingRequest(@Valid @RequestBody MetaphorReprocessingRequest metaphorReprocessingRequest) {
         log.info("Received a request to handle a reprocessing request...");
-//       metaphorReprocessingService.handleReprocessingRequest(metaphorReprocessingRequest);
+       metaphorReprocessingService.handleReprocessingRequest(metaphorReprocessingRequest);
     }
 }

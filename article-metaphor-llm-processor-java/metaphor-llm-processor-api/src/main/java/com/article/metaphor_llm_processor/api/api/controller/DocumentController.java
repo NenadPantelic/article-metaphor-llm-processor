@@ -1,9 +1,9 @@
 package com.article.metaphor_llm_processor.api.api.controller;
 
-import ai.metaphor.document_api.dto.request.DocumentFilterRequest;
-import ai.metaphor.document_api.dto.response.Document;
-import ai.metaphor.document_api.dto.response.DocumentItem;
-import ai.metaphor.document_api.service.DocumentService;
+import com.article.metaphor_llm_processor.api.dto.request.DocumentFilterRequest;
+import com.article.metaphor_llm_processor.api.dto.response.Document;
+import com.article.metaphor_llm_processor.api.dto.response.DocumentItem;
+import com.article.metaphor_llm_processor.api.service.DocumentService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 

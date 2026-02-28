@@ -62,7 +62,7 @@ class DocumentIndexingFailureRetryProcessorTest {
 
         var chunk = new IndexedDocumentChunk(
                 "test-chunk-id", "test-document-id", "text", DocumentChunkStatus.PENDING, 1,
-                null, null, null, null
+                null, null, null, null, false
         );
         var indexingReport = new IndexingReport(List.of(chunk), null, false);
         Mockito.doReturn(indexingReport).when(retryableIndexingExecutor).tryIndexing(source, origin, 1);

@@ -12,38 +12,35 @@
     <artifactId>article-metaphor-llm-processor-java</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <packaging>pom</packaging>
-    <name>metaphor-llm-processor</name>
+    <name>article-metaphor-llm-processor</name>
     <description>Demo project for Spring Boot</description>
-    <url/>
-    <licenses>
-        <license/>
-    </licenses>
-    <developers>
-        <developer/>
-    </developers>
+<!--    <url/>-->
+<!--    <licenses>-->
+<!--        <license/>-->
+<!--    </licenses>-->
+<!--    <developers>-->
+<!--        <developer/>-->
+<!--    </developers>-->
     <modules>
         <module>metaphor-processing-orchestrator</module>
         <module>article-indexer</module>
         <module>common</module>
         <module>metaphor-llm-processor-api</module>
     </modules>
-    <scm>
-        <connection/>
-        <developerConnection/>
-        <tag/>
-        <url/>
-    </scm>
+<!--    <scm>-->
+<!--        <connection/>-->
+<!--        <developerConnection/>-->
+<!--        <tag/>-->
+<!--        <url/>-->
+<!--    </scm>-->
     <properties>
         <java.version>17</java.version>
+        <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
+        <dep.spring-boot.version>4.0.3</dep.spring-boot.version>
         <dep.spring-ai.version>1.0.0-M6</dep.spring-ai.version>
+        <dep.lombok.version>1.18.42</dep.lombok.version>
     </properties>
     <dependencies>
-        <!-- Internal dependencies -->
-        <dependency>
-            <groupId>com.article.metaphor_llm_processor</groupId>
-            <artifactId>common</artifactId>
-            <version>${project.version}</version>
-        </dependency>
         <!-- Spring dependencies -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -90,6 +87,7 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
+            <version>${dep.lombok.version}</version>
             <optional>true</optional>
         </dependency>
         <dependency>
@@ -129,18 +127,24 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
+                <version>${maven-compiler-plugin.version}</version>
                 <configuration>
                     <annotationProcessorPaths>
                         <path>
                             <groupId>org.projectlombok</groupId>
                             <artifactId>lombok</artifactId>
+                            <version>${dep.lombok.version}</version>
                         </path>
                     </annotationProcessorPaths>
+                    <source>17</source>
+                    <target>17</target>
+                    <release>17</release>
                 </configuration>
             </plugin>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <version>${dep.spring-boot.version}</version>
                 <configuration>
                     <excludes>
                         <exclude>

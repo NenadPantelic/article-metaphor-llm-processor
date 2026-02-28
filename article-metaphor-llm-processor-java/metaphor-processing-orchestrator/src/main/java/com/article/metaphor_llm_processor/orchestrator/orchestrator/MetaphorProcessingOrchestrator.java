@@ -8,7 +8,7 @@ import com.article.metaphor_llm_processor.common.repository.IndexedDocumentChunk
 import com.article.metaphor_llm_processor.common.repository.IndexedDocumentRepository;
 import com.article.metaphor_llm_processor.orchestrator.configproperties.ProcessingConfigProperties;
 import com.article.metaphor_llm_processor.orchestrator.dto.message.DocumentChunkProcessingMessage;
-import com.article.metaphor_llm_processor.orchestrator.model.ChunkProcessingAttempt;
+import com.article.metaphor_llm_processor.common.model.ChunkProcessingAttempt;
 import com.article.metaphor_llm_processor.orchestrator.producer.ChunkProcessingMessageProducer;
 import com.article.metaphor_llm_processor.orchestrator.repository.DocumentReprocessingRequestRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -79,7 +79,7 @@ public class MetaphorProcessingOrchestrator {
         var now = Instant.now();
 
         try {
-            chunkToProcess.setStatus(DocumentChunkStatus.LEXICAL_UNIT_PROCESSING__PENDING);
+            chunkToProcess.setStatus(DocumentChunkStatus.STARTED_PROCESSING);
             chunkToProcess = chunkRepository.save(chunkToProcess);
 
             chunkProcessingMessageProducer.sendMessage(new DocumentChunkProcessingMessage(chunkToProcess.getId()));
@@ -89,18 +89,18 @@ public class MetaphorProcessingOrchestrator {
             log.warn("The document[id = {}] processing failed. Reason: {}", document.getId(), e.getMessage(), e);
             chunkToProcess.addAttempt(
                     new ChunkProcessingAttempt(
-                            now, e.getMessage(), DocumentChunkStatus.LEXICAL_UNIT_PROCESSING__PENDING
+                            now, e.getMessage(), DocumentChunkStatus.STARTED_PROCESSING
                     )
             );
             chunkToProcess.setLastProcessingAttemptedAt(now);
             // not possible to retry, all attempts exhausted
             if (chunkToProcess.getAttempts().size() >= maxProcessingRetries) {
                 log.warn("Processing attempt exhausted for chunk[id = {}, documentId = {}]", chunkId, chunkDocumentId);
-                chunkToProcess.setStatus(DocumentChunkStatus.FAILED_TO_PROCESS);
+                chunkToProcess.setStatus(DocumentChunkStatus.PROCESSING_FAILED);
                 chunkRepository.save(chunkToProcess);
                 updateDocumentIfAllChunksProcessed(chunkId, chunkDocumentId, document);
             } else {
-                chunkToProcess.setStatus(DocumentChunkStatus.NEXT_ATTEMPT_NEEDED);
+                chunkToProcess.setShouldBeReprocessed(true);
                 chunkRepository.save(chunkToProcess);
             }
         }
