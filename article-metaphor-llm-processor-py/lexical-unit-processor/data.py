@@ -10,4 +10,5 @@ class Chunk:
         return {
             "chunk_id": self.chunk_id,
             "document_id": self.document_id,
+            # TODO: complete the payload
         }

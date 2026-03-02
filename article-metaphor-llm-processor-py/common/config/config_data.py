@@ -1,6 +1,6 @@
 import os
 from dataclasses import dataclass
-from config import config
+from config.config import config
 
 # Assistant section/keys and default values
 _ASSISTANT_SECTION = "assistant"
@@ -23,6 +23,15 @@ _RABBITMQ_PASSWORD_KEY = "password"
 
 _DEFAULT_HOST = "localhost"
 _DEFAULT_RABBITMQ_PORT = 5672
+
+# chunk-processing-state API client
+_CHUNK_PROCESSING_STATE_API_SECTION = "chunk-processing-state-api"
+_CHUNK_PROCESSING_STATE_API_HOST_KEY = "host"
+_CHUNK_PROCESSING_STATE_API_PORT_KEY = "port"
+_CHUNK_PROCESSING_STATE_API_KEY_KEY = "api_key"
+
+
+# timeouts
 
 
 def read_env_variable(env_variable: str) -> str:
@@ -77,5 +86,12 @@ class RabbitMQConfig:
         return RabbitMQConfig(host=host, port=port, vhost=vhost, username=username, password=password)
 
 
+@dataclass
+class ChunkProcessingStateApiClientConfig:
+    host: str
+    port: int
+    api_key: str
+
 assistant_config = AssistantConfig.from_config(config)
 rabbitmq_config = RabbitMQConfig.from_config(config)
+chunk_processing_state_api_client_config = ChunkProcessingStateApiClientConfig(config)
