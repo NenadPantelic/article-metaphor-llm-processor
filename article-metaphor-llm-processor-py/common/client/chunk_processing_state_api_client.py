@@ -8,7 +8,7 @@ from data.chunk_processing_state import ChunkProcessingStateUpdate
 from exception.client_exception import ClientException
 from helper.serialization import serialize_body, deserialize_body
 
-X_API_KEY_HEADER = "X-api-key"
+X_SERVICE_KEY_HEADER = "X-service-key"
 
 
 class HttpMethod(Enum):
@@ -27,7 +27,7 @@ class ChunkProcessingStateApiClient:
         self._session = Session()
 
         self._session.headers.update({
-            X_API_KEY_HEADER: chunk_processing_api_client_config.api_key,
+            X_SERVICE_KEY_HEADER: chunk_processing_api_client_config.service_key,
             _CONTENT_TYPE_HEADER: _APPLICATION_JSON
         })
         self._base_api_path = api_base_path

@@ -1,6 +1,6 @@
 import os
 from dataclasses import dataclass
-from config.config import config
+from config.config import config, Config
 
 # Assistant section/keys and default values
 _ASSISTANT_SECTION = "assistant"
@@ -28,7 +28,7 @@ _DEFAULT_RABBITMQ_PORT = 5672
 _CHUNK_PROCESSING_STATE_API_SECTION = "chunk-processing-state-api"
 _CHUNK_PROCESSING_STATE_API_HOST_KEY = "host"
 _CHUNK_PROCESSING_STATE_API_PORT_KEY = "port"
-_CHUNK_PROCESSING_STATE_API_KEY_KEY = "api_key"
+_CHUNK_PROCESSING_STATE_SERVICE_KEY_KEY = "service_key"
 
 
 # timeouts
@@ -90,8 +90,18 @@ class RabbitMQConfig:
 class ChunkProcessingStateApiClientConfig:
     host: str
     port: int
-    api_key: str
+    service_key: str
+
+    @staticmethod
+    def from_config(_config: Config):
+        chunk_processing_state_api_section = _config[_CHUNK_PROCESSING_STATE_API_SECTION]
+
+        api_host = chunk_processing_state_api_section.get(_CHUNK_PROCESSING_STATE_API_HOST_KEY)
+        api_port = chunk_processing_state_api_section.get(_CHUNK_PROCESSING_STATE_API_PORT_KEY)
+        api_service_key = chunk_processing_state_api_section.get(_CHUNK_PROCESSING_STATE_SERVICE_KEY_KEY)
+        return ChunkProcessingStateApiClientConfig(api_host, api_port, api_service_key)
+
 
 assistant_config = AssistantConfig.from_config(config)
 rabbitmq_config = RabbitMQConfig.from_config(config)
-chunk_processing_state_api_client_config = ChunkProcessingStateApiClientConfig(config)
+chunk_processing_state_api_client_config = ChunkProcessingStateApiClientConfig.from_config(config)

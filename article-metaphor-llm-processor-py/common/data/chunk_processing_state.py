@@ -14,7 +14,7 @@ class ChunkProcessingStateUpdate:
     document_id: str
     state: ChunkProcessingState
     should_be_reprocessed: bool = False
-    payload: dict[str, Any] = None
+    payload: dict[str, Any] | None = None
 
     def to_dict(self) -> dict[str, Any]:
         return {
