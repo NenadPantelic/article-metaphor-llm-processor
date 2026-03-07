@@ -4,15 +4,20 @@ from typing import Any
 
 
 class ChunkProcessingState(Enum):
+    LEXICAL_UNIT_PROCESSING__IN_PROGRESS = "LEXICAL_UNIT_PROCESSING__IN_PROGRESS"
     LEXICAL_UNIT_PROCESSING__COMPLETE = "LEXICAL_UNIT_PROCESSING__COMPLETE"
     LEXICAL_UNIT_PROCESSING__FAILED = "LEXICAL_UNIT_PROCESSING__FAILED"
+
+    DICTIONARY_ACCESS__IN_PROGRESS = "DICTIONARY_ACCESS__IN_PROGRESS"
+    DICTIONARY_ACCESS__COMPLETE = "DICTIONARY_ACCESS__COMPLETE"
+    DICTIONARY_ACCESS__FAILED = "DICTIONARY_ACCESS__FAILED"
 
 
 @dataclass
 class ChunkProcessingStateUpdate:
     chunk_id: str
     document_id: str
-    state: ChunkProcessingState
+    state: ChunkProcessingState = None
     should_be_reprocessed: bool = False
     payload: dict[str, Any] | None = None
 
