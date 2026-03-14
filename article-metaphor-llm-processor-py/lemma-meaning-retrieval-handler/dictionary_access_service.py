@@ -9,22 +9,27 @@ No LLM usage.
 """
 
 import time
-from typing import List, Dict
+from typing import List, Dict, Any
 
 from client.cambridge_dictionary_client import CambridgeDictionaryClient
 from client.ldoce_dictionary_client import LDOCEDictionaryClient
+from data.lexical_unit_data import LexicalUnitData
+from processor.processor_service import ProcessorService
 
 REQUEST_DELAY = 1.0  # seconds
 
 
-# TODO: add caching
-
-class DictionaryAccessService:
+class DictionaryAccessService(ProcessorService):
     def __init__(self):
+        super().__init__()
         self._ldoce_client = LDOCEDictionaryClient()
         self._cambridge_client = CambridgeDictionaryClient()
 
-    def lookup_cambridge(self, lemma: str) -> List[str]:
+    def process(self, lexical_unit_data: LexicalUnitData) -> Dict[str, Any]:
+        data = self._get_lu_meanings(lexical_unit_data.lexical_units, lexical_unit_data.unique_lemmas)
+        return {"meanings": data}
+
+    def _lookup_cambridge(self, lemma: str) -> List[str]:
         """
         Do lookup the Cambridge dictionary.
         :param lemma: lemma to look up
@@ -33,7 +38,7 @@ class DictionaryAccessService:
         # TODO: add caching
         return self._cambridge_client.lookup(lemma)
 
-    def lookup_ldoce(self, lemma: str) -> List[str]:
+    def _lookup_ldoce(self, lemma: str) -> List[str]:
         """
         Do lookup the LDOCE dictionary.
         :param lemma: a lemma to look up
@@ -42,7 +47,7 @@ class DictionaryAccessService:
         # TODO: add caching
         return self._ldoce_client.lookup(lemma)
 
-    def lookup_basic_meanings(self, lemmas: List[str]) -> Dict[str, Dict[str, List[str]]]:
+    def _lookup_basic_meanings(self, lemmas: List[str]) -> Dict[str, Dict[str, List[str]]]:
         """
         Returns:
         {
@@ -56,10 +61,10 @@ class DictionaryAccessService:
         results = {}
 
         for lemma in lemmas:
-            cambridge_defs = self.lookup_cambridge(lemma)
+            cambridge_defs = self._lookup_cambridge(lemma)
             time.sleep(REQUEST_DELAY)
 
-            ldoce_defs = self.lookup_ldoce(lemma)
+            ldoce_defs = self._lookup_ldoce(lemma)
             time.sleep(REQUEST_DELAY)
 
             results[lemma] = {
@@ -69,8 +74,8 @@ class DictionaryAccessService:
 
         return results
 
-    def get_lu_meanings(self, lexical_units, unique_lemmas):
-        meaning_map = self.lookup_basic_meanings(unique_lemmas)
+    def _get_lu_meanings(self, lexical_units, unique_lemmas):
+        meaning_map = self._lookup_basic_meanings(unique_lemmas)
         enriched = []
 
         for lu in lexical_units:

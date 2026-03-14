@@ -3,6 +3,9 @@ import spacy
 from flashtext import KeywordProcessor
 import uuid
 
+from common.data.chunk import Chunk
+from processor.processor_service import ProcessorService
+
 # POS tags considered lexical units under MIPVU
 CONTENT_POS = {"NOUN", "VERB", "ADJ", "ADV"}
 
@@ -141,7 +144,7 @@ def preprocess_text(text: str, mwe_list: List[str] = None) -> Dict[str, Any]:
 # ---------------------------
 
 
-class LexicalUnitTextPreprocessor:
+class LexicalUnitTextPreprocessor(ProcessorService):
     def __init__(self):
         # TODO: check NER
         self._nlp = spacy.load("en_core_web_sm", disable=["ner"])  # NER not needed here
@@ -291,16 +294,17 @@ class LexicalUnitTextPreprocessor:
         """
         return sorted({lu["lemma"] for lu in unique_lexical_units})
 
-    def process_text(self, text: str) -> Dict[str, Any]:
+    def process(self, chunk: Chunk) -> Dict[str, Any]:
         """
         Process the input text and extract:
         1. sentences
         2. lexical units
         3. unique lemmas
 
-        :param text: text to be processed
+        :param chunk: chunk whose text is going to be processed
         :return: execute the lexical unit processing
         """
+        text = chunk.text
         doc = self._nlp(text)
         sentences = self.do_sentence_segmentation(doc)
         mwe_matches = self.do_mwe_detection(text, DEFAULT_MWES)
@@ -313,7 +317,6 @@ class LexicalUnitTextPreprocessor:
         unique_lemmas = self.get_unique_lemmas(unique_lexical_units)
 
         return {
-            "sentences": sentences,
             "lexical_units": unique_lexical_units,
             "unique_lemmas": unique_lemmas,
         }

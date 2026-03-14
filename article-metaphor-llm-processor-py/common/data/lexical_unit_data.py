@@ -2,23 +2,25 @@ from dataclasses import dataclass
 from json import dumps
 from typing import Any
 
-from rabbitmq.serializable_message import SerializableMessage
+from data.message import OutputMessage, InputMessage
 
 
 @dataclass
-class LexicalUnitData(SerializableMessage):
+class LexicalUnitData(InputMessage, OutputMessage):
     chunk_id: str
     document_id: str
-    sentences: list[dict[str, Any]]
+    # sentences: list[dict[str, Any]]
     lexical_units: list[dict[str, Any]]
     unique_lemmas: list[dict[str, Any]]
 
     def serialize(self) -> bytes:
-        data = {
+        return dumps(self.to_dict())
+
+    def to_dict(self) -> dict:
+        return {
             "chunk_id": self.chunk_id,
             "document_id": self.document_id,
-            "sentences": self.sentences,
+            # "sentences": self.sentences,
             "lexical_units": self.lexical_units,
             "unique_lemmas": self.unique_lemmas
         }
-        return dumps(data)

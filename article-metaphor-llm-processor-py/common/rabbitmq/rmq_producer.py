@@ -1,7 +1,7 @@
 from common.config.config_data import RabbitMQConfig
 from common.exception.rmq_exception import RabbitMQException
 from common.rabbitmq.rmq_handler import RabbitMQHandler
-from rabbitmq.serializable_message import SerializableMessage
+from data.message import OutputMessage
 
 
 class RabbitMQProducer(RabbitMQHandler):
@@ -11,7 +11,7 @@ class RabbitMQProducer(RabbitMQHandler):
         self._routing_key = routing_key
         self._expected_message_type = expected_message_type
 
-    def send(self, body: SerializableMessage = None):
+    def send(self, body: OutputMessage = None):
         """
         Produces a message to RabbitMQ.
         :param body: the payload to send to the right queue.
