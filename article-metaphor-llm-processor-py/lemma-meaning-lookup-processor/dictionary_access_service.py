@@ -11,6 +11,8 @@ No LLM usage.
 import time
 from typing import List, Dict, Any
 
+from cache import LemmaMeaningsCache
+from config.logconfig import get_logger
 from client.cambridge_dictionary_client import CambridgeDictionaryClient
 from client.ldoce_dictionary_client import LDOCEDictionaryClient
 from data.lexical_unit_data import LexicalUnitData
@@ -18,12 +20,15 @@ from processor.processor_service import ProcessorService
 
 REQUEST_DELAY = 1.0  # seconds
 
+log = get_logger()
+
 
 class DictionaryAccessService(ProcessorService):
-    def __init__(self):
+    def __init__(self, cache: LemmaMeaningsCache):
         super().__init__()
         self._ldoce_client = LDOCEDictionaryClient()
         self._cambridge_client = CambridgeDictionaryClient()
+        self._cache = cache
 
     def process(self, lexical_unit_data: LexicalUnitData) -> Dict[str, Any]:
         data = self._get_lu_meanings(lexical_unit_data.lexical_units, lexical_unit_data.unique_lemmas)
@@ -35,8 +40,14 @@ class DictionaryAccessService(ProcessorService):
         :param lemma: lemma to look up
         :return: a list of Cambridge explanations
         """
-        # TODO: add caching
-        return self._cambridge_client.lookup(lemma)
+        cached_result = self._cache.get_cambridge_lemma_meanings(lemma)
+        if cached_result:
+            log.debug("Returning cached result")
+            return cached_result
+
+        meanings = self._cambridge_client.lookup(lemma)
+        self._cache.put_cambridge_lemma_meanings(lemma, meanings)
+        return meanings
 
     def _lookup_ldoce(self, lemma: str) -> List[str]:
         """
@@ -44,8 +55,14 @@ class DictionaryAccessService(ProcessorService):
         :param lemma: a lemma to look up
         :return: a list of LDOCE explanations
         """
-        # TODO: add caching
-        return self._ldoce_client.lookup(lemma)
+        cached_result = self._cache.get_ldoce_lemma_meanings(lemma)
+        if cached_result:
+            log.debug("Returning cached result")
+            return cached_result
+
+        meanings = self._ldoce_client.lookup(lemma)
+        self._cache.put_cambridge_lemma_meanings(lemma, meanings)
+        return meanings
 
     def _lookup_basic_meanings(self, lemmas: List[str]) -> Dict[str, Dict[str, List[str]]]:
         """

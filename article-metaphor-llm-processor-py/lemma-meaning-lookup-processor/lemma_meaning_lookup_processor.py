@@ -9,7 +9,7 @@ from exception.invalid_data_exception import InvalidDataException
 from processor.pipeline_step_processor import PipelineStepProcessor
 from rabbitmq.rmq_producer import RabbitMQProducer
 
-log = LogConfig.default(__name__, "lemma_meaning_retrieval_handler")
+log = LogConfig.default(__name__, "lemma_meaning_lookup_processor")
 
 
 class LemmaMeaningRetrievalHandler(PipelineStepProcessor):
