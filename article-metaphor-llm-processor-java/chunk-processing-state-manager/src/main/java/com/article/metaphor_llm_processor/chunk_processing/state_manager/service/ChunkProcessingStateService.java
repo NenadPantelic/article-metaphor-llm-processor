@@ -1,10 +1,11 @@
 package com.article.metaphor_llm_processor.chunk_processing.state_manager.service;
 
-import com.article.metaphor_llm_processor.chunk_processing.state_manager.dto.response.ChunkProcessingStateInfo;
+import com.article.metaphor_llm_processor.chunk_processing.state_manager.dto.inout.ChunkProcessingStateData;
+import com.article.metaphor_llm_processor.chunk_processing.state_manager.dto.out.ChunkStateUpdateResult;
 
 public interface ChunkProcessingStateService {
 
-    void updateChunkProcessingState(String chunkId, Object statePayload);
+    ChunkStateUpdateResult updateChunkProcessingState(String chunkId, ChunkProcessingStateData newState);
 
-    ChunkProcessingStateInfo getChunkProcessingInfo(String chunkId, String stage);
+    ChunkProcessingStateData getChunkProcessingInfo(String chunkId, String stage);
 }

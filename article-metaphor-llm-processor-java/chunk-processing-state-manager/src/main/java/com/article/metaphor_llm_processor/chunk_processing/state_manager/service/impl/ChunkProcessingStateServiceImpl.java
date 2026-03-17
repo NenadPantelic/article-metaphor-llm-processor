@@ -1,8 +1,10 @@
 package com.article.metaphor_llm_processor.chunk_processing.state_manager.service.impl;
 
-import com.article.metaphor_llm_processor.chunk_processing.state_manager.dto.response.ChunkProcessingStateInfo;
+import com.article.metaphor_llm_processor.chunk_processing.state_manager.dto.inout.ChunkProcessingStateData;
+import com.article.metaphor_llm_processor.chunk_processing.state_manager.dto.out.ChunkStateUpdateResult;
 import com.article.metaphor_llm_processor.chunk_processing.state_manager.model.ChunkProcessingState;
-import com.article.metaphor_llm_processor.chunk_processing.state_manager.service.ChunkProcessingInfoService;
+import com.article.metaphor_llm_processor.chunk_processing.state_manager.repository.ChunkProcessingStateRepository;
+import com.article.metaphor_llm_processor.chunk_processing.state_manager.service.ChunkProcessingDataService;
 import com.article.metaphor_llm_processor.chunk_processing.state_manager.service.ChunkProcessingStateService;
 import com.article.metaphor_llm_processor.common.exception.ApiException;
 import com.article.metaphor_llm_processor.common.exception.ErrorReport;
@@ -17,12 +19,13 @@ import java.util.Map;
 @Service
 public class ChunkProcessingStateServiceImpl implements ChunkProcessingStateService {
 
-    private Map<String, ChunkProcessingInfoService> stateServiceMap;
+    private final Map<String, ChunkProcessingDataService> stateServiceMap;
 
-    private final LexicalUnitProcessingInfoService lexicalUnitProcessingInfoService;
+    private final ChunkProcessingStateRepository chunkProcessingStateRepository;
 
-    public ChunkProcessingStateServiceImpl(LexicalUnitProcessingInfoService lexicalUnitProcessingInfoService) {
-        this.lexicalUnitProcessingInfoService = lexicalUnitProcessingInfoService;
+    public ChunkProcessingStateServiceImpl(LexicalUnitProcessingDataService lexicalUnitProcessingInfoService,
+                                           ChunkProcessingStateRepository chunkProcessingStateRepository) {
+        this.chunkProcessingStateRepository = chunkProcessingStateRepository;
         this.stateServiceMap = new HashMap<>();
 
         stateServiceMap.put(DocumentChunkStatus.STARTED_PROCESSING.name(), lexicalUnitProcessingInfoService);
@@ -30,19 +33,38 @@ public class ChunkProcessingStateServiceImpl implements ChunkProcessingStateServ
     }
 
     @Override
-    public void updateChunkProcessingState(String chunkId, Object statePayload) {
+    public ChunkStateUpdateResult updateChunkProcessingState(String chunkId, ChunkProcessingStateData newState) {
+        log.info("Updating the chunk processing state: chunkId = {}, data = {}", chunkId, newState);
 
+        ChunkProcessingState chunkProcessingState = chunkProcessingStateRepository.findByChunkId(chunkId)
+                .orElseThrow(
+                        () -> new ApiException(ErrorReport.NOT_FOUND)
+                );
+
+        ChunkProcessingDataService chunkProcessingDataService = getDataServiceOrThrowException(
+                newState.data().getState()
+        );
+        chunkProcessingDataService.updateChunkProcessingStateData(chunkProcessingState, newState.data());
+        chunkProcessingState = chunkProcessingStateRepository.save(chunkProcessingState);
+        return new ChunkStateUpdateResult(
+                chunkProcessingState.getChunkId(),
+                chunkProcessingState.getState()
+        );
     }
 
     @Override
-    public ChunkProcessingStateInfo getChunkProcessingInfo(String chunkId, String stage) {
-        log.info("Fetching the chunk processing info: chunkId = {}, stage = {}", chunkId, stage);
+    public ChunkProcessingStateData getChunkProcessingInfo(String chunkId, String state) {
+        log.info("Fetching the chunk processing info: chunkId = {}, stage = {}", chunkId, state);
+        ChunkProcessingDataService chunkProcessingDataService = getDataServiceOrThrowException(state);
+        return chunkProcessingDataService.getProcessingInfo(chunkId);
+    }
 
-        ChunkProcessingInfoService chunkProcessingInfoService = stateServiceMap.get(stage);
-        if (chunkProcessingInfoService == null) {
-            throw new ApiException(ErrorReport.BAD_REQUEST.withMessage("Invalid stage"));
+    private ChunkProcessingDataService getDataServiceOrThrowException(String state) {
+        ChunkProcessingDataService chunkProcessingDataService = stateServiceMap.get(state);
+        if (chunkProcessingDataService == null) {
+            throw new ApiException(ErrorReport.BAD_REQUEST.withMessage(String.format("Invalid state: %s", state)));
         }
 
-        return chunkProcessingInfoService.getProcessingInfo(chunkId);
+        return chunkProcessingDataService;
     }
 }

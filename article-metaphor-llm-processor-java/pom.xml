@@ -26,6 +26,7 @@
         <module>article-indexer</module>
         <module>common</module>
         <module>metaphor-llm-processor-api</module>
+        <module>chunk-processing-state-manager</module>
     </modules>
 <!--    <scm>-->
 <!--        <connection/>-->
