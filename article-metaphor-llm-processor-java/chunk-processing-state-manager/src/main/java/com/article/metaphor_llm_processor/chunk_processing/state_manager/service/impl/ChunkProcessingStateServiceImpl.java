@@ -9,8 +9,10 @@ import com.article.metaphor_llm_processor.chunk_processing.state_manager.service
 import com.article.metaphor_llm_processor.common.exception.ApiException;
 import com.article.metaphor_llm_processor.common.exception.ErrorReport;
 import com.article.metaphor_llm_processor.common.model.DocumentChunkStatus;
+import com.article.metaphor_llm_processor.common.repository.IndexedDocumentChunkRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -22,16 +24,26 @@ public class ChunkProcessingStateServiceImpl implements ChunkProcessingStateServ
     private final Map<String, ChunkProcessingDataService> stateServiceMap;
 
     private final ChunkProcessingStateRepository chunkProcessingStateRepository;
+    private final IndexedDocumentChunkRepository chunkRepository;
 
     public ChunkProcessingStateServiceImpl(LexicalUnitProcessingDataService lexicalUnitProcessingInfoService,
-                                           ChunkProcessingStateRepository chunkProcessingStateRepository) {
+                                           LemmaMeaningProcessorDataService lemmaMeaningProcessorDataService,
+                                           ChunkProcessingStateRepository chunkProcessingStateRepository,
+                                           IndexedDocumentChunkRepository chunkRepository) {
         this.chunkProcessingStateRepository = chunkProcessingStateRepository;
+        this.chunkRepository = chunkRepository;
         this.stateServiceMap = new HashMap<>();
 
-        stateServiceMap.put(DocumentChunkStatus.STARTED_PROCESSING.name(), lexicalUnitProcessingInfoService);
+        stateServiceMap.put(DocumentChunkStatus.LEXICAL_UNIT_PROCESSING__IN_PROGRESS.name(), lexicalUnitProcessingInfoService);
+        stateServiceMap.put(DocumentChunkStatus.LEXICAL_UNIT_PROCESSING__COMPLETE.name(), lexicalUnitProcessingInfoService);
         stateServiceMap.put(DocumentChunkStatus.LEXICAL_UNIT_PROCESSING__FAILED.name(), lexicalUnitProcessingInfoService);
+
+        stateServiceMap.put(DocumentChunkStatus.DICTIONARY_ACCESS__IN_PROGRESS.name(), lemmaMeaningProcessorDataService);
+        stateServiceMap.put(DocumentChunkStatus.DICTIONARY_ACCESS__COMPLETE.name(), lemmaMeaningProcessorDataService);
+        stateServiceMap.put(DocumentChunkStatus.DICTIONARY_ACCESS__FAILED.name(), lemmaMeaningProcessorDataService);
     }
 
+    @Transactional
     @Override
     public ChunkStateUpdateResult updateChunkProcessingState(String chunkId, ChunkProcessingStateData newState) {
         log.info("Updating the chunk processing state: chunkId = {}, data = {}", chunkId, newState);
@@ -46,6 +58,12 @@ public class ChunkProcessingStateServiceImpl implements ChunkProcessingStateServ
         );
         chunkProcessingDataService.updateChunkProcessingStateData(chunkProcessingState, newState.data());
         chunkProcessingState = chunkProcessingStateRepository.save(chunkProcessingState);
+
+        long numOfUpdated = chunkRepository.updateChunkState(chunkId, newState.data().getState());
+        if (numOfUpdated == 0) {
+            throw new ApiException(ErrorReport.INTERNAL_SERVER_ERROR);
+        }
+
         return new ChunkStateUpdateResult(
                 chunkProcessingState.getChunkId(),
                 chunkProcessingState.getState()

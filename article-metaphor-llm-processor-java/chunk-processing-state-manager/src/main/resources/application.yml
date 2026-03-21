@@ -1,0 +1,6 @@
+spring:
+  application:
+    name: chunk-processing-state-manager
+
+auth:
+  service-session-key: TBA
