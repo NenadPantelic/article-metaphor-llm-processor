@@ -4,6 +4,7 @@ import com.article.metaphor_llm_processor.common.model.IndexedDocumentChunk;
 import org.springframework.data.mongodb.repository.Aggregation;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
+import org.springframework.data.mongodb.repository.Update;
 
 import java.util.List;
 import java.util.Optional;
@@ -34,4 +35,9 @@ public interface IndexedDocumentChunkRepository extends MongoRepository<IndexedD
             "{$project: { 'totalLength': 1, '_id': 0}}"
     })
     Integer findCumulativeLengthOfPreviousChunks(String documentId, int order);
+
+
+    @Query("{ '_id': ?0 }")
+    @Update("{ '$set': { 'status': ?1 } }")
+    long updateChunkState(String id, String chunkStatus);
 }

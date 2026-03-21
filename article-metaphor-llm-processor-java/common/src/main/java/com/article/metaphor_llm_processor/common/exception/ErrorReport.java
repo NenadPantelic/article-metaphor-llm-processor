@@ -6,6 +6,7 @@ public record ErrorReport(String message, int status, List<String> errorMessages
 
     public static ErrorReport BAD_REQUEST = new ErrorReport("Bad request.", 400, List.of());
     public static ErrorReport NOT_FOUND = new ErrorReport("Not found.", 404, List.of());
+    public static ErrorReport INTERNAL_SERVER_ERROR = new ErrorReport("Internal server error.", 500, List.of());
 
     public ErrorReport withMessage(String message) {
         return new ErrorReport(message, this.status, this.errorMessages);
