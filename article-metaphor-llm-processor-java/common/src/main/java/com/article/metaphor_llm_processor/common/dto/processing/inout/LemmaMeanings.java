@@ -1,4 +1,4 @@
-package com.article.metaphor_llm_processor.chunk_processing.state_manager.dto.inout;
+package com.article.metaphor_llm_processor.common.dto.processing.inout;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 

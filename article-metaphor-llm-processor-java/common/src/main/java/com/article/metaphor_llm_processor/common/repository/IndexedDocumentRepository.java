@@ -9,9 +9,18 @@ import java.util.Optional;
 public interface IndexedDocumentRepository extends MongoRepository<IndexedDocument, String> {
 
     @Aggregation(pipeline = {
-            "{$match: { 'status': {$in: ['PENDING', 'PROCESSING', 'PENDING_REPROCESSING', 'REPROCESSING']}}}",
+            "{$match: { 'status': {$in: ['PENDING', 'PROCESSING']}}}",
             "{$sort: {'createdAt': 1}}",
             "{$limit: 1}"
     })
     Optional<IndexedDocument> findOldestEligibleDocumentForProcessing();
+
+
+    @Aggregation(pipeline = {
+            "{$match: { 'status': {$in: ['PENDING_REPROCESSING', 'REPROCESSING']}}}",
+            "{$sort: {'createdAt': 1}}",
+            "{$limit: 1}"
+    })
+    Optional<IndexedDocument> findOldestEligibleDocumentForReprocessing();
+
 }

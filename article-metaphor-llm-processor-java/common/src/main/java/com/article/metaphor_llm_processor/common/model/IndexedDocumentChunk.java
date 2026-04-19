@@ -53,4 +53,12 @@ public class IndexedDocumentChunk {
     public void clearAllAttempts() {
         attempts.clear();
     }
+
+    public boolean hasPreviousAttempts() {
+        return attempts != null && !attempts.isEmpty();
+    }
+
+    public ProcessingMilestone getMilestone() {
+        return this.getStatus().getMilestone();
+    }
 }

@@ -1,8 +1,5 @@
 package com.article.metaphor_llm_processor.chunk_processing.state_manager.service.impl;
 
-import com.article.metaphor_llm_processor.chunk_processing.state_manager.dto.inout.ChunkProcessingData;
-import com.article.metaphor_llm_processor.chunk_processing.state_manager.dto.inout.LemmaMeanings;
-import com.article.metaphor_llm_processor.chunk_processing.state_manager.dto.inout.LemmaMeaningsData;
 import com.article.metaphor_llm_processor.chunk_processing.state_manager.model.ChunkProcessingState;
 import com.article.metaphor_llm_processor.chunk_processing.state_manager.repository.ChunkProcessingStateRepository;
 import com.article.metaphor_llm_processor.chunk_processing.state_manager.service.ChunkProcessingDataService;
@@ -14,36 +11,36 @@ import java.util.Map;
 
 @Slf4j
 @Service
-public class LemmaMeaningProcessorDataService extends ChunkProcessingDataService {
+public class LexicalUnitProcessingDataService extends ChunkProcessingDataService {
 
-    private static final String LEMMA_MEANINGS_ATTR_KEY = "lemma_meanings";
+    private static final String LEXICAL_UNITS_ATTR_KEY = "lexical_units";
+    private static final String UNIQUE_LEMMAS_ATTR_KEY = "unique_lemmas";
 
-    protected LemmaMeaningProcessorDataService(ChunkProcessingStateRepository chunkProcessingStateRepository) {
+    protected LexicalUnitProcessingDataService(ChunkProcessingStateRepository chunkProcessingStateRepository) {
         super(chunkProcessingStateRepository);
     }
 
     @Override
     public void updateChunkProcessingStateData(ChunkProcessingState chunkProcessingState,
                                                ChunkProcessingData chunkProcessingData) {
-        LemmaMeaningsData lemmaMeaningsData = (LemmaMeaningsData) chunkProcessingData;
+        LexicalUnitProcessingData lexicalUnitProcessingData = (LexicalUnitProcessingData) chunkProcessingData;
         Map<String, Object> data = chunkProcessingState.getData();
+
         Map<String, Object> lexicalUnitProcessingAttributes = Map.of(
-                LEMMA_MEANINGS_ATTR_KEY,
-                lemmaMeaningsData.lemmaMeanings()
+                LEXICAL_UNITS_ATTR_KEY, lexicalUnitProcessingData.lexicalUnits(),
+                UNIQUE_LEMMAS_ATTR_KEY, lexicalUnitProcessingData.uniqueLemmas()
         );
-        data.put(lemmaMeaningsData.getState(), lexicalUnitProcessingAttributes);
+        data.put(lexicalUnitProcessingData.getState(), lexicalUnitProcessingAttributes);
     }
 
     @Override
     protected ChunkProcessingData mapToProcessingState(ChunkProcessingState chunkProcessingState) {
         Map<String, Object> data = chunkProcessingState.getData();
-        List<Object> meaningObjects = (List<Object>) data.get(LEMMA_MEANINGS_ATTR_KEY);
 
-        List<LemmaMeanings> lemmaMeanings = meaningObjects.stream()
-                .map(LemmaMeanings.class::cast)
-                .toList();
-        return new LemmaMeaningsData(lemmaMeanings);
+        return new LexicalUnitProcessingData(
+                (List<Map<String, String>>) data.get(LEXICAL_UNITS_ATTR_KEY),
+                (List<Map<String, String>>) data.get(UNIQUE_LEMMAS_ATTR_KEY)
+        );
     }
 
 }
-
