@@ -16,7 +16,23 @@ public interface IndexedDocumentChunkRepository extends MongoRepository<IndexedD
             "{$sort: {'order': 1}}",
             "{$limit: 1}"
     })
-    Optional<IndexedDocumentChunk> findFirstChunkEligibleForProcessing(String documentId);
+    Optional<IndexedDocumentChunk> findFirstChunkEligibleForProcessingByDocumentId(String documentId);
+
+
+    @Aggregation(pipeline = {
+            "{$match: { 'status': 'PENDING'}}",
+            "{$sort: {'order': 1}}",
+            "{$limit: 1}"
+    })
+    Optional<IndexedDocumentChunk> findFirstChunkEligibleForProcessing();
+
+    @Aggregation(pipeline = {
+            "{$match: { 'status': {$in: ['NEXT_ATTEMPT_NEEDED', 'PENDING_REPROCESSING']}}}",
+            "{$sort: {'order': 1}}",
+            "{$limit: 1}"
+    })
+    Optional<IndexedDocumentChunk> findFirstChunkEligibleForReprocessing();
+
 
     List<IndexedDocumentChunk> findByDocumentId(String documentId);
 
@@ -40,4 +56,7 @@ public interface IndexedDocumentChunkRepository extends MongoRepository<IndexedD
     @Query("{ '_id': ?0 }")
     @Update("{ '$set': { 'status': ?1 } }")
     long updateChunkState(String id, String chunkStatus);
+
+    @Query("{ '_documentId': ?0, 'order': {$gte: ?1 }}")
+    List<IndexedDocumentChunk> findByDocumentIdAndOrderGreaterThanOrEq(String documentId, int order);
 }

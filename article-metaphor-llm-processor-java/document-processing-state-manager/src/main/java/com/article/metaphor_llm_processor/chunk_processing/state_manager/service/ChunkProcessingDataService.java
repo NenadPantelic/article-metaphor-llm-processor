@@ -1,9 +1,9 @@
 package com.article.metaphor_llm_processor.chunk_processing.state_manager.service;
 
-import com.article.metaphor_llm_processor.chunk_processing.state_manager.dto.inout.ChunkProcessingData;
 import com.article.metaphor_llm_processor.chunk_processing.state_manager.dto.inout.ChunkProcessingStateData;
 import com.article.metaphor_llm_processor.chunk_processing.state_manager.model.ChunkProcessingState;
 import com.article.metaphor_llm_processor.chunk_processing.state_manager.repository.ChunkProcessingStateRepository;
+import com.article.metaphor_llm_processor.common.dto.processing.ChunkProcessingData;
 import com.article.metaphor_llm_processor.common.exception.ApiException;
 import com.article.metaphor_llm_processor.common.exception.ErrorReport;
 import lombok.extern.slf4j.Slf4j;
