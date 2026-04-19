@@ -9,8 +9,7 @@
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 
-    <groupId>com.metaphor.llm.processor</groupId>
-    <artifactId>metaphor-llm-processor-api</artifactId>
+    <artifactId>metaphor-processor-api</artifactId>
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
@@ -21,10 +20,14 @@
 
     <dependencies>
         <dependency>
+            <groupId>com.article.metaphor_llm_processor</groupId>
+            <artifactId>common</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
             <groupId>com.github.ben-manes.caffeine</groupId>
             <artifactId>caffeine</artifactId>
             <version>${dep.caffeine.version}</version>
         </dependency>
     </dependencies>
-
 </project>

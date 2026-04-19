@@ -36,5 +36,4 @@ public class AuthController {
         log.info("Logout request received...");
         authService.logout();
     }
-
 }
