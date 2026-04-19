@@ -7,7 +7,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
 
 @SpringBootApplication
-@ConfigurationPropertiesScan(basePackages = "com.article.metaphor_llm_processor.api", basePackageClasses = {
+@ConfigurationPropertiesScan(basePackages = "com.article.metaphor_llm_processor", basePackageClasses = {
 		AuthConfigProperties.class,
 		UserDetailsConfigProperties.class
 })
