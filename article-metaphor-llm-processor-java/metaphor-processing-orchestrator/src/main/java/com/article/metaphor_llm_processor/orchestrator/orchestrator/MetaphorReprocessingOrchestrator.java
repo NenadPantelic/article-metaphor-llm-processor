@@ -8,10 +8,12 @@ import com.article.metaphor_llm_processor.common.repository.IndexedDocumentRepos
 import com.article.metaphor_llm_processor.orchestrator.configproperties.ProcessingConfigProperties;
 import com.article.metaphor_llm_processor.orchestrator.exception.ProcessorException;
 import com.article.metaphor_llm_processor.orchestrator.producer.ChunkProcessingMessageProducer;
+import com.article.metaphor_llm_processor.orchestrator.statemanager.StateManager;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.Map;
 import java.util.Optional;
 
@@ -30,19 +32,15 @@ public class MetaphorReprocessingOrchestrator extends ProcessingOrchestrator {
             DocumentChunkStatus.METAPHOR_ANALYSIS__PENDING, ProcessingMilestone.DICTIONARY_ACCESS.name()
     );
 
-
-    private final IndexedDocumentRepository documentRepository;
-    private final IndexedDocumentChunkRepository chunkRepository;
     private final DocumentProcessingStateManagerClient client;
 
     public MetaphorReprocessingOrchestrator(IndexedDocumentRepository documentRepository,
                                             IndexedDocumentChunkRepository chunkRepository,
                                             ChunkProcessingMessageProducer chunkProcessingMessageProducer,
+                                            StateManager stateManager,
                                             ProcessingConfigProperties processingConfigProperties,
                                             DocumentProcessingStateManagerClient client) {
-        super(documentRepository, chunkRepository, chunkProcessingMessageProducer, processingConfigProperties);
-        this.documentRepository = documentRepository;
-        this.chunkRepository = chunkRepository;
+        super(documentRepository, chunkRepository, chunkProcessingMessageProducer, stateManager, processingConfigProperties);
         this.client = client;
     }
 
@@ -115,7 +113,13 @@ public class MetaphorReprocessingOrchestrator extends ProcessingOrchestrator {
 
         Optional<IndexedDocument> documentOptional = documentRepository.findById(chunk.getDocumentId());
         if (documentOptional.isEmpty()) {
-            failChunkAndSucceedingChunks(chunk, "Chunk document not found");
+            Instant now = Instant.now();
+            chunk.setLastProcessingAttemptedAt(now);
+            chunk.setStatus(DocumentChunkStatus.PROCESSING_FAILED);
+            chunk.addAttempt(
+                    new ChunkProcessingAttempt(now, "Chunk document not found", chunk.getMilestone())
+            );
+            stateManager.failChunk(chunk, "Chunk document not found");
         } else {
             reprocessChunk(chunk);
         }
@@ -131,7 +135,7 @@ public class MetaphorReprocessingOrchestrator extends ProcessingOrchestrator {
             doProcess(chunk, newStatus);
         } catch (Exception e) {
             log.error("Reprocessing failed due to {}", e.getMessage(), e);
-            failChunkAndSucceedingChunks(chunk, e.getMessage());
+            stateManager.failChunk(chunk, e.getMessage());
         }
     }
 }

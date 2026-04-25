@@ -10,6 +10,7 @@ import com.article.metaphor_llm_processor.common.repository.IndexedDocumentChunk
 import com.article.metaphor_llm_processor.common.repository.IndexedDocumentRepository;
 import com.article.metaphor_llm_processor.orchestrator.configproperties.ProcessingConfigProperties;
 import com.article.metaphor_llm_processor.orchestrator.producer.ChunkProcessingMessageProducer;
+import com.article.metaphor_llm_processor.orchestrator.statemanager.StateManager;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -26,16 +27,13 @@ public class MetaphorProcessingOrchestrator extends ProcessingOrchestrator {
             DocumentStatus.PENDING_REPROCESSING, DocumentStatus.REPROCESSING
     );
 
-    private final IndexedDocumentRepository documentRepository;
-    private final IndexedDocumentChunkRepository chunkRepository;
 
     public MetaphorProcessingOrchestrator(IndexedDocumentRepository documentRepository,
                                           IndexedDocumentChunkRepository chunkRepository,
+                                          StateManager stateManager,
                                           ChunkProcessingMessageProducer chunkProcessingMessageProducer,
                                           ProcessingConfigProperties processingConfigProperties) {
-        super(documentRepository, chunkRepository, chunkProcessingMessageProducer, processingConfigProperties);
-        this.documentRepository = documentRepository;
-        this.chunkRepository = chunkRepository;
+        super(documentRepository, chunkRepository, chunkProcessingMessageProducer, stateManager, processingConfigProperties);
     }
 
 
