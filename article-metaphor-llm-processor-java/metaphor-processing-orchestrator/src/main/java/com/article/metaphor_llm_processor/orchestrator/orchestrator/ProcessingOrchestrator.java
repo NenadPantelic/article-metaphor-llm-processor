@@ -6,29 +6,32 @@ import com.article.metaphor_llm_processor.common.repository.IndexedDocumentChunk
 import com.article.metaphor_llm_processor.common.repository.IndexedDocumentRepository;
 import com.article.metaphor_llm_processor.orchestrator.configproperties.ProcessingConfigProperties;
 import com.article.metaphor_llm_processor.orchestrator.producer.ChunkProcessingMessageProducer;
+import com.article.metaphor_llm_processor.orchestrator.statemanager.StateManager;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
-import java.util.List;
 
 @Slf4j
 @Service
 public abstract class ProcessingOrchestrator {
 
-    private final ChunkProcessingMessageProducer chunkProcessingMessageProducer;
-    private final IndexedDocumentRepository documentRepository;
-    private final IndexedDocumentChunkRepository chunkRepository;
+    protected final ChunkProcessingMessageProducer chunkProcessingMessageProducer;
+    protected final StateManager stateManager;
+    protected final IndexedDocumentRepository documentRepository;
+    protected final IndexedDocumentChunkRepository chunkRepository;
     private final int maxProcessingRetries;
 
     public ProcessingOrchestrator(
             IndexedDocumentRepository documentRepository,
             IndexedDocumentChunkRepository chunkRepository,
             ChunkProcessingMessageProducer chunkProcessingMessageProducer,
+            StateManager stateManager,
             ProcessingConfigProperties processingConfigProperties) {
         this.chunkProcessingMessageProducer = chunkProcessingMessageProducer;
         this.documentRepository = documentRepository;
         this.chunkRepository = chunkRepository;
+        this.stateManager = stateManager;
         this.maxProcessingRetries = processingConfigProperties.maxRetry();
     }
 
@@ -59,63 +62,15 @@ public abstract class ProcessingOrchestrator {
                 );
                 chunk.setStatus(DocumentChunkStatus.PROCESSING_FAILED);
                 chunkRepository.save(chunk);
-                documentRepository.findById(chunk.getDocumentId()).ifPresent(
-                        (document) -> updateDocumentIfAllChunksProcessed(chunkId, documentId, document)
-                );
+                stateManager.updateDocumentIfAllChunksProcessed(chunkId, documentId);
             } else {
-                chunk.setShouldBeReprocessed(true);
+                chunk.setLastAttemptReprocessable(true);
                 chunkRepository.save(chunk);
             }
         }
     }
 
     abstract ChunkProcessingData createChunkProcessingData(IndexedDocumentChunk chunk);
-
-    protected void failChunkAndSucceedingChunks(IndexedDocumentChunk startingChunk,
-                                                String errorMessage) {
-        List<IndexedDocumentChunk> chunks = chunkRepository.findByDocumentIdAndOrderGreaterThanOrEq(
-                startingChunk.getDocumentId(), startingChunk.getOrder()
-        );
-        Instant now = Instant.now();
-
-        chunks.forEach(chunk -> {
-            chunk.setLastProcessingAttemptedAt(now);
-            chunk.setStatus(DocumentChunkStatus.PROCESSING_FAILED);
-            chunk.addAttempt(
-                    new ChunkProcessingAttempt(now, errorMessage, chunk.getMilestone())
-            );
-        });
-
-        chunkRepository.saveAll(chunks);
-    }
-
-    protected void updateDocumentIfAllChunksProcessed(String chunkId,
-                                                      String chunkDocumentId,
-                                                      IndexedDocument document) {
-        log.info("Checking if chunkId '{}' was the last chunk of document[id = {}]", chunkId, chunkDocumentId);
-        int allChunksCount = chunkRepository.countByDocumentId(chunkDocumentId);
-        // TODO: can be one aggregating query
-        int successfullyProcessedCount = chunkRepository.countSuccessfullyProcessedByDocumentId(chunkDocumentId);
-        int processingFailuresCount = chunkRepository.countProcessingFailuresByDocumentId(chunkDocumentId);
-
-        log.info("Document[id = {}] chunk processing completeness report: processed with success = {}, " +
-                        "processed with failure = {}, total = {}", chunkDocumentId, successfullyProcessedCount,
-                processingFailuresCount, allChunksCount);
-
-        if (successfullyProcessedCount + processingFailuresCount == allChunksCount) {
-            var currentStatus = document.getStatus();
-            log.info("All chunks of a document[id = {}] are processed.", chunkDocumentId);
-            DocumentStatus documentStatus = processingFailuresCount == 0 ?
-                    DocumentStatus.DONE :
-                    DocumentStatus.INCOMPLETE;
-            document.setStatus(documentStatus);
-            documentRepository.save(document);
-
-            if (currentStatus == DocumentStatus.REPROCESSING) {
-                // tryRemoveReprocessingRequest(document.getId());
-            }
-        }
-    }
 
     private String getRoutingKey(DocumentChunkStatus status) {
         return switch (status) {

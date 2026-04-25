@@ -1,4 +1,4 @@
-package com.article.metaphor_llm_processor.orchestrator.dto.reprocessing;
+package com.article.metaphor_llm_processor.orchestrator.dto;
 
 import jakarta.validation.constraints.NotBlank;
 
