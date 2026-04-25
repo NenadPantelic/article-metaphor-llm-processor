@@ -29,3 +29,10 @@ processing:
 
 reprocessing:
   reprocessing-queue: q.article-reprocessing
+
+document-state-manager-client:
+  url: TODO
+  max-retry: 3
+  delay: 1000 # 1s
+  multiplier: 2.0
+  max-delay: 20000 # 20s

@@ -8,14 +8,14 @@ import com.article.metaphor_llm_processor.orchestrator.configproperties.Processi
 import com.article.metaphor_llm_processor.orchestrator.statemanager.StateManager;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.List;
 
 @Slf4j
-@Component
+@Service
 public class StuckProcessingChunksHousekeeper {
 
     private static final String PROCESSING_ATTEMPT_TIMEOUT_MESSAGE = "Chunk is too long in the same processing state";
