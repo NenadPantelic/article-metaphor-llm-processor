@@ -1,7 +1,7 @@
 package com.article.metaphor_llm_processor.article_indexer.indexing;
 
 import com.article.metaphor_llm_processor.article_indexer.configproperties.IndexingConfigProperties;
-import com.article.metaphor_llm_processor.common.model.DocumentChunkStatus;
+import com.article.metaphor_llm_processor.common.model.DocumentChunkState;
 import com.article.metaphor_llm_processor.common.model.IndexedDocumentChunk;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -31,11 +31,11 @@ class RetryableIndexingExecutorTest {
 
         var now = Instant.now();
         var documentChunkOne = new IndexedDocumentChunk(
-                "test-id-1", "test-document-id-1", "Test 1234567890", DocumentChunkStatus.PENDING, 1,
+                "test-id-1", "test-document-id-1", "Test 1234567890", DocumentChunkState.PENDING, 1,
                 null, now, now, now, false
         );
         var documentChunkTwo = new IndexedDocumentChunk(
-                "test-id-2", "test-document-id-2", "Test 0987654321", DocumentChunkStatus.PENDING, 2,
+                "test-id-2", "test-document-id-2", "Test 0987654321", DocumentChunkState.PENDING, 2,
                 null, now, now, now, false
         );
         List<IndexedDocumentChunk> chunks = List.of(documentChunkOne, documentChunkTwo);

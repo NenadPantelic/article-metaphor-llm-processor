@@ -65,7 +65,6 @@ public class AuthHandler {
 
     public void clearAuthentication(String credential) {
         if (credential != null) {
-            // TODO
             identitySessionCache.invalidate(credential);
         }
     }

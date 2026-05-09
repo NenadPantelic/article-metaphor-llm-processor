@@ -1,7 +1,7 @@
 package com.article.metaphor_llm_processor.article_indexer.indexing;
 
 import com.article.metaphor_llm_processor.article_indexer.exception.IndexingException;
-import com.article.metaphor_llm_processor.common.model.DocumentStatus;
+import com.article.metaphor_llm_processor.common.model.DocumentState;
 import com.article.metaphor_llm_processor.common.model.IndexedDocument;
 import com.article.metaphor_llm_processor.common.model.IndexedDocumentChunk;
 import com.article.metaphor_llm_processor.common.model.OriginType;
@@ -54,7 +54,7 @@ public class DocumentIndexingServiceImpl implements DocumentIndexingService {
                     indexedDocument.getId(), indexedDocument.getName(), chunks.size()
             );
             // the document is now ready for processing
-            indexedDocument.setStatus(DocumentStatus.PENDING);
+            indexedDocument.setState(DocumentState.PENDING);
             documentRepository.save(indexedDocument);
             return chunks;
         } catch (MalformedURLException e) {

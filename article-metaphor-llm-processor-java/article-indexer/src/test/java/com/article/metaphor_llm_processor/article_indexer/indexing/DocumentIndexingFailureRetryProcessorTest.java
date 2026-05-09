@@ -1,6 +1,6 @@
 package com.article.metaphor_llm_processor.article_indexer.indexing;
 
-import com.article.metaphor_llm_processor.common.model.DocumentChunkStatus;
+import com.article.metaphor_llm_processor.common.model.DocumentChunkState;
 import com.article.metaphor_llm_processor.common.model.IndexedDocumentChunk;
 import com.article.metaphor_llm_processor.common.model.OriginType;
 import com.article.metaphor_llm_processor.article_indexer.model.DocumentIndexingAttempt;
@@ -61,7 +61,7 @@ class DocumentIndexingFailureRetryProcessorTest {
                 .findOldestAttemptedFailureEligibleForRetry();
 
         var chunk = new IndexedDocumentChunk(
-                "test-chunk-id", "test-document-id", "text", DocumentChunkStatus.PENDING, 1,
+                "test-chunk-id", "test-document-id", "text", DocumentChunkState.PENDING, 1,
                 null, null, null, null, false
         );
         var indexingReport = new IndexingReport(List.of(chunk), null, false);

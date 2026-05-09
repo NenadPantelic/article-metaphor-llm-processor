@@ -1,6 +1,6 @@
 package com.article.metaphor_llm_processor.common.model;
 
-public enum DocumentStatus {
+public enum DocumentState {
 
     // not yet ready, still being indexed
     NOT_READY,

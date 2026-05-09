@@ -3,6 +3,9 @@ package com.article.metaphor_llm_processor.chunk_processing.state_manager.servic
 import com.article.metaphor_llm_processor.chunk_processing.state_manager.model.ChunkProcessingState;
 import com.article.metaphor_llm_processor.chunk_processing.state_manager.repository.ChunkProcessingStateRepository;
 import com.article.metaphor_llm_processor.chunk_processing.state_manager.service.ChunkProcessingDataService;
+import com.article.metaphor_llm_processor.common.dto.processing.ChunkProcessingData;
+import com.article.metaphor_llm_processor.common.dto.processing.inout.LemmaMeanings;
+import com.article.metaphor_llm_processor.common.dto.processing.inout.LemmaMeaningsData;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -28,7 +31,7 @@ public class LemmaMeaningProcessorDataService extends ChunkProcessingDataService
                 LEMMA_MEANINGS_ATTR_KEY,
                 lemmaMeaningsData.lemmaMeanings()
         );
-        data.put(lemmaMeaningsData.getState(), lexicalUnitProcessingAttributes);
+        data.put(chunkProcessingState.getState(), lexicalUnitProcessingAttributes);
     }
 
     @Override

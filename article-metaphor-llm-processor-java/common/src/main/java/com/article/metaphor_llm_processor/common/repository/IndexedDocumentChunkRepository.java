@@ -12,7 +12,7 @@ import java.util.Optional;
 public interface IndexedDocumentChunkRepository extends MongoRepository<IndexedDocumentChunk, String> {
 
     @Aggregation(pipeline = {
-            "{$match: { 'documentId': ?0, 'status': {$in: ['PENDING', 'NEXT_ATTEMPT_NEEDED', 'PENDING_REPROCESSING']}}}",
+            "{$match: { 'documentId': ?0, 'state': {$in: ['PENDING', 'NEXT_ATTEMPT_NEEDED', 'PENDING_REPROCESSING']}}}",
             "{$sort: {'order': 1}}",
             "{$limit: 1}"
     })
@@ -20,14 +20,14 @@ public interface IndexedDocumentChunkRepository extends MongoRepository<IndexedD
 
 
     @Aggregation(pipeline = {
-            "{$match: { 'status': 'PENDING'}}",
+            "{$match: { 'state': 'PENDING'}}",
             "{$sort: {'order': 1}}",
             "{$limit: 1}"
     })
     Optional<IndexedDocumentChunk> findFirstChunkEligibleForProcessing();
 
     @Aggregation(pipeline = {
-            "{$match: { 'status': {$in: ['ANOTHER_ATTEMPT_NEEDED', 'PENDING_REPROCESSING']}}}",
+            "{$match: { 'state': {$in: ['ANOTHER_ATTEMPT_NEEDED', 'PENDING_REPROCESSING']}}}",
             "{$sort: {'order': 1}}",
             "{$limit: 1}"
     })
@@ -38,10 +38,10 @@ public interface IndexedDocumentChunkRepository extends MongoRepository<IndexedD
 
     int countByDocumentId(String documentId);
 
-    @Query(value = "{'status': 'SUCCESSFULLY_PROCESSED'}", count = true)
+    @Query(value = "{'state': 'SUCCESSFULLY_PROCESSED'}", count = true)
     int countSuccessfullyProcessedByDocumentId(String documentId);
 
-    @Query(value = "{'status': 'FAILED_TO_PROCESS'}", count = true)
+    @Query(value = "{'state': 'FAILED_TO_PROCESS'}", count = true)
     int countProcessingFailuresByDocumentId(String documentId);
 
     @Aggregation(pipeline = {
@@ -54,8 +54,8 @@ public interface IndexedDocumentChunkRepository extends MongoRepository<IndexedD
 
 
     @Query("{ '_id': ?0 }")
-    @Update("{ '$set': { 'status': ?1 } }")
-    long updateChunkState(String id, String chunkStatus);
+    @Update("{ '$set': { 'state': ?1 } }")
+    long updateChunkState(String id, String chunkState);
 
     @Query("{ '_documentId': ?0, 'order': {$gte: ?1 }}")
     List<IndexedDocumentChunk> findByDocumentIdAndOrderGreaterThanOrEq(String documentId, int order);
@@ -63,7 +63,7 @@ public interface IndexedDocumentChunkRepository extends MongoRepository<IndexedD
     @Aggregation(pipeline = {
             """
                     {$match: {
-                     'status': {
+                     'state': {
                            $in: ['STARTED_PROCESSING', 'LEXICAL_UNIT_PROCESSING__PENDING',
                            'LEXICAL_UNIT_PROCESSING__IN_PROGRESS', 'DICTIONARY_ACCESS__PENDING',
                            'DICTIONARY_ACCESS__IN_PROGRESS', 'METAPHOR_ANALYSIS__PENDING', 'METAPHOR_ANALYSIS__IN_PROGRESS'

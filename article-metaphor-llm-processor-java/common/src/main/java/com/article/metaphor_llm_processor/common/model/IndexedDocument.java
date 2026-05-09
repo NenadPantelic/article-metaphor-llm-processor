@@ -42,7 +42,7 @@ public class IndexedDocument {
     private OriginType type;
 
     @Builder.Default
-    private DocumentStatus status = DocumentStatus.NOT_READY;
+    private DocumentState state = DocumentState.NOT_READY;
 
     @Builder.Default
     private Set<Metaphor> metaphors = new HashSet<>();

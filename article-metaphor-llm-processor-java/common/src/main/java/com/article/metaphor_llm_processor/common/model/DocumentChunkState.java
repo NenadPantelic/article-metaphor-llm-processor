@@ -3,7 +3,7 @@ package com.article.metaphor_llm_processor.common.model;
 import lombok.Getter;
 
 @Getter
-public enum DocumentChunkStatus {
+public enum DocumentChunkState {
 
     // indexed, but processing has not yet started
     PENDING(ProcessingMilestone.NONE),
@@ -35,7 +35,7 @@ public enum DocumentChunkStatus {
 
     private final ProcessingMilestone milestone;
 
-    DocumentChunkStatus(ProcessingMilestone milestone) {
+    DocumentChunkState(ProcessingMilestone milestone) {
         this.milestone = milestone;
     }
 }

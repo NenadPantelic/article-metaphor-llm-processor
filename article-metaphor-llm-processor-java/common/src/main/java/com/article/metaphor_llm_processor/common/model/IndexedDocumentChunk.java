@@ -30,13 +30,13 @@ public class IndexedDocumentChunk {
     @NotBlank
     private String text;
     @Builder.Default
-    private DocumentChunkStatus status = DocumentChunkStatus.PENDING;
+    private DocumentChunkState state = DocumentChunkState.PENDING;
     @NotNull
     @Min(1)
     @Builder.Default
     private int order = 1;
     @Builder.Default
-    private List<ChunkProcessingAttempt> attempts = new ArrayList<>();
+    private List<ChunkProcessingAttempt> failedAttempts = new ArrayList<>();
     @CreatedDate
     private Instant createdAt;
     @LastModifiedDate
@@ -47,19 +47,19 @@ public class IndexedDocumentChunk {
     @Builder.Default
     private boolean isLastAttemptReprocessable = false;
 
-    public void addAttempt(ChunkProcessingAttempt chunkProcessingAttempt) {
-        this.attempts.add(chunkProcessingAttempt);
+    public void addFailedAttempt(ChunkProcessingAttempt chunkProcessingAttempt) {
+        this.failedAttempts.add(chunkProcessingAttempt);
     }
 
-    public void clearAllAttempts() {
-        attempts.clear();
+    public void clearAllFailedAttempts() {
+        failedAttempts.clear();
     }
 
     public boolean hasPreviousAttempts() {
-        return attempts != null && !attempts.isEmpty();
+        return failedAttempts != null && !failedAttempts.isEmpty();
     }
 
     public ProcessingMilestone getMilestone() {
-        return this.getStatus().getMilestone();
+        return this.getState().getMilestone();
     }
 }
