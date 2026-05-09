@@ -9,7 +9,7 @@ import java.util.Optional;
 public interface IndexedDocumentRepository extends MongoRepository<IndexedDocument, String> {
 
     @Aggregation(pipeline = {
-            "{$match: { 'status': {$in: ['PENDING', 'PROCESSING']}}}",
+            "{$match: { 'state': {$in: ['PENDING', 'PROCESSING']}}}",
             "{$sort: {'createdAt': 1}}",
             "{$limit: 1}"
     })
@@ -17,7 +17,7 @@ public interface IndexedDocumentRepository extends MongoRepository<IndexedDocume
 
 
     @Aggregation(pipeline = {
-            "{$match: { 'status': {$in: ['PENDING_REPROCESSING', 'REPROCESSING']}}}",
+            "{$match: { 'state': {$in: ['PENDING_REPROCESSING', 'REPROCESSING']}}}",
             "{$sort: {'createdAt': 1}}",
             "{$limit: 1}"
     })

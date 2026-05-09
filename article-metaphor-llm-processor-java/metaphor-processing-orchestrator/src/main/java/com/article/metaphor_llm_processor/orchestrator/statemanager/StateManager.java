@@ -30,8 +30,8 @@ public class StateManager {
 
         chunks.forEach(chunk -> {
             chunk.setLastProcessingAttemptedAt(now);
-            chunk.setStatus(DocumentChunkStatus.PROCESSING_FAILED);
-            chunk.addAttempt(
+            chunk.setState(DocumentChunkState.PROCESSING_FAILED);
+            chunk.addFailedAttempt(
                     new ChunkProcessingAttempt(now, errorMessage, chunk.getMilestone())
             );
         });
@@ -43,8 +43,8 @@ public class StateManager {
                           String errorMessage) {
         Instant now = Instant.now();
         chunk.setLastProcessingAttemptedAt(now);
-        chunk.setStatus(DocumentChunkStatus.PROCESSING_FAILED);
-        chunk.addAttempt(
+        chunk.setState(DocumentChunkState.PROCESSING_FAILED);
+        chunk.addFailedAttempt(
                 new ChunkProcessingAttempt(now, errorMessage, chunk.getMilestone())
         );
         chunkRepository.save(chunk);
@@ -71,10 +71,10 @@ public class StateManager {
 
         if (successfullyProcessedCount + processingFailuresCount == allChunksCount) {
             log.info("All chunks of a document[id = {}] are processed.", documentId);
-            DocumentStatus documentStatus = processingFailuresCount == 0 ?
-                    DocumentStatus.DONE :
-                    DocumentStatus.INCOMPLETE;
-            document.setStatus(documentStatus);
+            DocumentState documentState = processingFailuresCount == 0 ?
+                    DocumentState.DONE :
+                    DocumentState.INCOMPLETE;
+            document.setState(documentState);
             documentRepository.save(document);
         }
     }

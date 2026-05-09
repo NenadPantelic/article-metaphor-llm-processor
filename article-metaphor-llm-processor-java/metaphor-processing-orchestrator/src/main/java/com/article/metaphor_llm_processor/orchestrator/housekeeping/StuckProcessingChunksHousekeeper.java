@@ -1,7 +1,7 @@
 package com.article.metaphor_llm_processor.orchestrator.housekeeping;
 
 import com.article.metaphor_llm_processor.common.model.ChunkProcessingAttempt;
-import com.article.metaphor_llm_processor.common.model.DocumentChunkStatus;
+import com.article.metaphor_llm_processor.common.model.DocumentChunkState;
 import com.article.metaphor_llm_processor.common.model.IndexedDocumentChunk;
 import com.article.metaphor_llm_processor.common.repository.IndexedDocumentChunkRepository;
 import com.article.metaphor_llm_processor.orchestrator.configproperties.ProcessingConfigProperties;
@@ -48,14 +48,14 @@ public class StuckProcessingChunksHousekeeper {
             ChunkProcessingAttempt chunkProcessingAttempt = new ChunkProcessingAttempt(
                     now, PROCESSING_ATTEMPT_TIMEOUT_MESSAGE, chunk.getMilestone()
             );
-            chunk.addAttempt(chunkProcessingAttempt);
+            chunk.addFailedAttempt(chunkProcessingAttempt);
 
-            if (chunk.getAttempts().size() >= maxProcessingRetries) {
-                chunk.setStatus(DocumentChunkStatus.PROCESSING_FAILED);
+            if (chunk.getFailedAttempts().size() >= maxProcessingRetries) {
+                chunk.setState(DocumentChunkState.PROCESSING_FAILED);
                 chunk.setLastAttemptReprocessable(false);
                 stateManager.updateDocumentIfAllChunksProcessed(chunk.getId(), chunk.getDocumentId());
             } else {
-                chunk.setStatus(DocumentChunkStatus.ANOTHER_ATTEMPT_NEEDED);
+                chunk.setState(DocumentChunkState.ANOTHER_ATTEMPT_NEEDED);
                 chunk.setLastAttemptReprocessable(true);
             }
         }

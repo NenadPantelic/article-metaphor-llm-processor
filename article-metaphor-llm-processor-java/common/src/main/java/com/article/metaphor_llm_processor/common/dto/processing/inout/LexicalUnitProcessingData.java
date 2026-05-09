@@ -9,8 +9,9 @@ import java.util.Map;
 public record LexicalUnitProcessingData(@JsonProperty("lexical_units") List<Map<String, String>> lexicalUnits,
                                         @JsonProperty("unique_lemmas") List<Map<String, String>> uniqueLemmas) implements ChunkProcessingData {
 
+
     @Override
-    public String getState() {
-        return "LEXICAL_UNIT_PROCESSING";
+    public String getType() {
+        return "lexical_processing_data";
     }
 }

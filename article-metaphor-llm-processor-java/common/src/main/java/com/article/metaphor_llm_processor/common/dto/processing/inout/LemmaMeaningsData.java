@@ -9,8 +9,8 @@ public record LemmaMeaningsData(@JsonProperty("lemma_meanings") List<LemmaMeanin
         implements ChunkProcessingData {
 
     @Override
-    public String getState() {
-        return "LEMMA_MEANINGS_LOOKUP";
+    public String getType() {
+        return "lemma_meanings_data";
     }
 }
 

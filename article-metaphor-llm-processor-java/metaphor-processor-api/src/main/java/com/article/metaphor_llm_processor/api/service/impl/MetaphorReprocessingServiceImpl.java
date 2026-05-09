@@ -1,7 +1,7 @@
 package com.article.metaphor_llm_processor.api.service.impl;
 
-import com.article.metaphor_llm_processor.common.model.DocumentChunkStatus;
-import com.article.metaphor_llm_processor.common.model.DocumentStatus;
+import com.article.metaphor_llm_processor.common.model.DocumentChunkState;
+import com.article.metaphor_llm_processor.common.model.DocumentState;
 import com.article.metaphor_llm_processor.common.model.IndexedDocument;
 import com.article.metaphor_llm_processor.common.repository.IndexedDocumentChunkRepository;
 import com.article.metaphor_llm_processor.common.repository.IndexedDocumentRepository;
@@ -18,7 +18,7 @@ import java.util.Optional;
 @Service
 public class MetaphorReprocessingServiceImpl implements MetaphorReprocessingService {
 
-    private static final List<DocumentStatus> FINAL_STATUSES = List.of(DocumentStatus.DONE, DocumentStatus.INCOMPLETE);
+    private static final List<DocumentState> FINAL_STATUSES = List.of(DocumentState.DONE, DocumentState.INCOMPLETE);
     private final IndexedDocumentRepository documentRepository;
     private final IndexedDocumentChunkRepository chunkRepository;
 
@@ -40,19 +40,19 @@ public class MetaphorReprocessingServiceImpl implements MetaphorReprocessingServ
         }
 
         var document = documentOptional.get();
-        if (!FINAL_STATUSES.contains(document.getStatus())) {
+        if (!FINAL_STATUSES.contains(document.getState())) {
             log.error("Document[id = {}] is not in final state, hence cannot be processed again.", documentId);
             return;
         }
 
-        document.setStatus(DocumentStatus.PENDING_REPROCESSING);
+        document.setState(DocumentState.PENDING_REPROCESSING);
         document.clearAllMetaphors();
         documentRepository.save(document);
 
         var chunks = chunkRepository.findByDocumentId(documentId);
         chunks.forEach(chunk -> {
-            chunk.clearAllAttempts();
-            chunk.setStatus(DocumentChunkStatus.PENDING_REPROCESSING);
+            chunk.clearAllFailedAttempts();
+            chunk.setState(DocumentChunkState.PENDING_REPROCESSING);
         });
         chunkRepository.saveAll(chunks);
     }

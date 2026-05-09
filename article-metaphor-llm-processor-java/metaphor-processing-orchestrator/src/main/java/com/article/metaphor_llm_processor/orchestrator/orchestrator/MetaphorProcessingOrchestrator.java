@@ -2,8 +2,8 @@ package com.article.metaphor_llm_processor.orchestrator.orchestrator;
 
 import com.article.metaphor_llm_processor.common.dto.processing.ChunkProcessingData;
 import com.article.metaphor_llm_processor.common.dto.processing.in.DocumentChunk;
-import com.article.metaphor_llm_processor.common.model.DocumentChunkStatus;
-import com.article.metaphor_llm_processor.common.model.DocumentStatus;
+import com.article.metaphor_llm_processor.common.model.DocumentChunkState;
+import com.article.metaphor_llm_processor.common.model.DocumentState;
 import com.article.metaphor_llm_processor.common.model.IndexedDocument;
 import com.article.metaphor_llm_processor.common.model.IndexedDocumentChunk;
 import com.article.metaphor_llm_processor.common.repository.IndexedDocumentChunkRepository;
@@ -22,9 +22,9 @@ import java.util.Optional;
 @Service
 public class MetaphorProcessingOrchestrator extends ProcessingOrchestrator {
 
-    private static final Map<DocumentStatus, DocumentStatus> DOCUMENT_STATUS_TRANSITION_MAP = Map.of(
-            DocumentStatus.PENDING, DocumentStatus.PROCESSING,
-            DocumentStatus.PENDING_REPROCESSING, DocumentStatus.REPROCESSING
+    private static final Map<DocumentState, DocumentState> DOCUMENT_STATUS_TRANSITION_MAP = Map.of(
+            DocumentState.PENDING, DocumentState.PROCESSING,
+            DocumentState.PENDING_REPROCESSING, DocumentState.REPROCESSING
     );
 
 
@@ -50,9 +50,9 @@ public class MetaphorProcessingOrchestrator extends ProcessingOrchestrator {
 
         var document = documentOptional.get();
         log.info("Document[id = {}, status = {}] is chosen. Its next chunk is about to be processed.",
-                document.getId(), document.getStatus()
+                document.getId(), document.getState()
         );
-        updateDocumentStatusIfNeeded(document);
+        updateDocumentStateIfNeeded(document);
         documentRepository.save(document);
 
         Optional<IndexedDocumentChunk> chunkOptional = chunkRepository.findFirstChunkEligibleForProcessingByDocumentId(
@@ -60,7 +60,7 @@ public class MetaphorProcessingOrchestrator extends ProcessingOrchestrator {
         );
         if (chunkOptional.isEmpty()) {
             log.info("There is no chunk waiting to be processed...");
-            document.setStatus(DocumentStatus.INCOMPLETE); // should not happen
+            document.setState(DocumentState.INCOMPLETE); // should not happen
             documentRepository.save(document);
             return;
         }
@@ -69,7 +69,7 @@ public class MetaphorProcessingOrchestrator extends ProcessingOrchestrator {
         String chunkId = chunkToProcess.getId();
         String chunkDocumentId = chunkToProcess.getDocumentId();
         log.info("Chunk[id = {}, documentId = {}] is about to be processed.", chunkId, chunkDocumentId);
-        doProcess(chunkToProcess, DocumentChunkStatus.STARTED_PROCESSING);
+        doProcess(chunkToProcess, DocumentChunkState.STARTED_PROCESSING);
     }
 
     @Override
@@ -77,11 +77,10 @@ public class MetaphorProcessingOrchestrator extends ProcessingOrchestrator {
         return new DocumentChunk(chunk.getDocumentId(), chunk.getId(), chunk.getText());
     }
 
-
-    void updateDocumentStatusIfNeeded(IndexedDocument document) {
-        DocumentStatus newStatus = DOCUMENT_STATUS_TRANSITION_MAP.get(document.getStatus());
-        if (newStatus != null) {
-            document.setStatus(newStatus);
+    void updateDocumentStateIfNeeded(IndexedDocument document) {
+        DocumentState newState = DOCUMENT_STATUS_TRANSITION_MAP.get(document.getState());
+        if (newState != null) {
+            document.setState(newState);
         }
     }
 }

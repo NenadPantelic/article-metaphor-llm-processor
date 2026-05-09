@@ -6,6 +6,8 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public record ProcessingConfigProperties(int maxRetry,
                                          int intervalInMillis,
                                          int reprocessingIntervalInMillis,
-                                         String lexicalUnitProcessingExchange) {
+                                         String lexicalUnitProcessingExchange,
+                                         String lemmaMeaningLookupProcessingExchange,
+                                         String metaphorAnalysisProcessingExchange) {
 
 }

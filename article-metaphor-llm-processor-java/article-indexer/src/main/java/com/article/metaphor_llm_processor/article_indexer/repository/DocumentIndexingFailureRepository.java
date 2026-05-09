@@ -9,7 +9,7 @@ import java.util.Optional;
 public interface DocumentIndexingFailureRepository extends MongoRepository<DocumentIndexingFailure, String> {
 
     @Aggregation(pipeline = {
-            "{$match: { 'status': 'ELIGIBLE_FOR_RETRY'}}",
+            "{$match: { 'state': 'ELIGIBLE_FOR_RETRY'}}",
             "{$sort: {'lastIndexingAttempt': 1}}",
             "{$limit: 1}"
     })

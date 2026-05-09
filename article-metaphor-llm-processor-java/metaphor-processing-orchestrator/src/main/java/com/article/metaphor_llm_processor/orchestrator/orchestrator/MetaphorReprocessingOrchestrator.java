@@ -21,15 +21,15 @@ import java.util.Optional;
 @Service
 public class MetaphorReprocessingOrchestrator extends ProcessingOrchestrator {
 
-    private static final Map<ProcessingMilestone, DocumentChunkStatus> REPROCESSING_MILESTONE_STATUS_TRANSITION_MAP = Map.of(
-            ProcessingMilestone.LEXICAL_UNIT_PROCESSING, DocumentChunkStatus.LEXICAL_UNIT_PROCESSING__PENDING,
-            ProcessingMilestone.DICTIONARY_ACCESS, DocumentChunkStatus.DICTIONARY_ACCESS__PENDING,
-            ProcessingMilestone.METAPHOR_ANALYSIS, DocumentChunkStatus.METAPHOR_ANALYSIS__PENDING
+    private static final Map<ProcessingMilestone, DocumentChunkState> REPROCESSING_MILESTONE_STATUS_TRANSITION_MAP = Map.of(
+            ProcessingMilestone.LEXICAL_UNIT_PROCESSING, DocumentChunkState.LEXICAL_UNIT_PROCESSING__PENDING,
+            ProcessingMilestone.DICTIONARY_ACCESS, DocumentChunkState.DICTIONARY_ACCESS__PENDING,
+            ProcessingMilestone.METAPHOR_ANALYSIS, DocumentChunkState.METAPHOR_ANALYSIS__PENDING
     );
 
-    private static final Map<DocumentChunkStatus, String> PREVIOUS_STATUS_MAPPING = Map.of(
-            DocumentChunkStatus.DICTIONARY_ACCESS__PENDING, ProcessingMilestone.LEXICAL_UNIT_PROCESSING.name(),
-            DocumentChunkStatus.METAPHOR_ANALYSIS__PENDING, ProcessingMilestone.DICTIONARY_ACCESS.name()
+    private static final Map<DocumentChunkState, String> PREVIOUS_STATUS_MAPPING = Map.of(
+            DocumentChunkState.DICTIONARY_ACCESS__PENDING, ProcessingMilestone.LEXICAL_UNIT_PROCESSING.name(),
+            DocumentChunkState.METAPHOR_ANALYSIS__PENDING, ProcessingMilestone.DICTIONARY_ACCESS.name()
     );
 
     private final DocumentProcessingStateManagerClient client;
@@ -70,7 +70,7 @@ public class MetaphorReprocessingOrchestrator extends ProcessingOrchestrator {
     }
 
     private String getPreviousStateBeforeReprocessing(IndexedDocumentChunk chunk) {
-        DocumentChunkStatus status = chunk.getStatus();
+        DocumentChunkState status = chunk.getState();
         String previousState = PREVIOUS_STATUS_MAPPING.get(status);
         if (previousState == null) {
             throw new ProcessorException(String.format("Document[id = %s] has invalid status for reprocessing: %s",
@@ -83,7 +83,7 @@ public class MetaphorReprocessingOrchestrator extends ProcessingOrchestrator {
 
     private void reprocessChunkByRequestedDocument(IndexedDocument document) {
         log.info("Document[id = {}, status = {}] is chosen. Its next chunk is about to be processed.",
-                document.getId(), document.getStatus()
+                document.getId(), document.getState()
         );
 
         Optional<IndexedDocumentChunk> chunkOptional = chunkRepository.findFirstChunkEligibleForProcessingByDocumentId(
@@ -91,13 +91,13 @@ public class MetaphorReprocessingOrchestrator extends ProcessingOrchestrator {
         );
         if (chunkOptional.isEmpty()) {
             log.info("There is no chunk associated with document {}", document.getId());
-            document.setStatus(DocumentStatus.DONE);
+            document.setState(DocumentState.DONE);
             documentRepository.save(document);
             return;
         }
 
-        if (document.getStatus() != DocumentStatus.REPROCESSING) {
-            document.setStatus(DocumentStatus.REPROCESSING);
+        if (document.getState() != DocumentState.REPROCESSING) {
+            document.setState(DocumentState.REPROCESSING);
             documentRepository.save(document);
         }
 
@@ -105,18 +105,18 @@ public class MetaphorReprocessingOrchestrator extends ProcessingOrchestrator {
     }
 
     private void reprocessChunkAfterFailure(IndexedDocumentChunk chunk) {
-        DocumentChunkStatus currentStatus = chunk.getStatus();
+        DocumentChunkState currentState = chunk.getState();
         ProcessingMilestone currentMilestone = chunk.getMilestone();
         log.info("Chunk to be reprocessed[id = {}, current status = {}, current milestone = {}]",
-                chunk.getId(), currentStatus, currentMilestone
+                chunk.getId(), currentState, currentMilestone
         );
 
         Optional<IndexedDocument> documentOptional = documentRepository.findById(chunk.getDocumentId());
         if (documentOptional.isEmpty()) {
             Instant now = Instant.now();
             chunk.setLastProcessingAttemptedAt(now);
-            chunk.setStatus(DocumentChunkStatus.PROCESSING_FAILED);
-            chunk.addAttempt(
+            chunk.setState(DocumentChunkState.PROCESSING_FAILED);
+            chunk.addFailedAttempt(
                     new ChunkProcessingAttempt(now, "Chunk document not found", chunk.getMilestone())
             );
             stateManager.failChunk(chunk, "Chunk document not found");
@@ -129,10 +129,10 @@ public class MetaphorReprocessingOrchestrator extends ProcessingOrchestrator {
         try {
             ProcessingMilestone milestone = chunk.getMilestone();
             log.info("Reprocess chunk: {} with milestone {}", chunk.getId(), milestone);
-            DocumentChunkStatus newStatus = REPROCESSING_MILESTONE_STATUS_TRANSITION_MAP.getOrDefault(
-                    milestone, DocumentChunkStatus.LEXICAL_UNIT_PROCESSING__PENDING
+            DocumentChunkState newState = REPROCESSING_MILESTONE_STATUS_TRANSITION_MAP.getOrDefault(
+                    milestone, DocumentChunkState.LEXICAL_UNIT_PROCESSING__PENDING
             );
-            doProcess(chunk, newStatus);
+            doProcess(chunk, newState);
         } catch (Exception e) {
             log.error("Reprocessing failed due to {}", e.getMessage(), e);
             stateManager.failChunk(chunk, e.getMessage());

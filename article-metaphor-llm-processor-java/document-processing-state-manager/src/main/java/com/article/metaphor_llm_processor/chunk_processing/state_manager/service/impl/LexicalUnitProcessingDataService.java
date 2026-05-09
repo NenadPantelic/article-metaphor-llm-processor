@@ -3,6 +3,8 @@ package com.article.metaphor_llm_processor.chunk_processing.state_manager.servic
 import com.article.metaphor_llm_processor.chunk_processing.state_manager.model.ChunkProcessingState;
 import com.article.metaphor_llm_processor.chunk_processing.state_manager.repository.ChunkProcessingStateRepository;
 import com.article.metaphor_llm_processor.chunk_processing.state_manager.service.ChunkProcessingDataService;
+import com.article.metaphor_llm_processor.common.dto.processing.ChunkProcessingData;
+import com.article.metaphor_llm_processor.common.dto.processing.inout.LexicalUnitProcessingData;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -30,7 +32,7 @@ public class LexicalUnitProcessingDataService extends ChunkProcessingDataService
                 LEXICAL_UNITS_ATTR_KEY, lexicalUnitProcessingData.lexicalUnits(),
                 UNIQUE_LEMMAS_ATTR_KEY, lexicalUnitProcessingData.uniqueLemmas()
         );
-        data.put(lexicalUnitProcessingData.getState(), lexicalUnitProcessingAttributes);
+        data.put(chunkProcessingState.getState(), lexicalUnitProcessingAttributes);
     }
 
     @Override
