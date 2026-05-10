@@ -1,0 +1,17 @@
+package com.article.metaphor_llm_processor.common.dto.processing.inout;
+
+import com.article.metaphor_llm_processor.common.dto.processing.ChunkProcessingData;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import java.util.List;
+
+public record LemmaMeaningsData(@JsonProperty("lemma_meanings") List<LemmaMeanings> lemmaMeanings)
+        implements ChunkProcessingData {
+
+    @Override
+    public String getType() {
+        return "lemma_meanings_data";
+    }
+}
+
+

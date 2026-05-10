@@ -8,7 +8,7 @@ import com.article.metaphor_llm_processor.article_indexer.model.DocumentIndexing
 import com.article.metaphor_llm_processor.article_indexer.model.DocumentIndexingFailure;
 import com.article.metaphor_llm_processor.article_indexer.model.DocumentIndexingFailureStatus;
 import com.article.metaphor_llm_processor.article_indexer.repository.DocumentIndexingFailureRepository;
-import com.article.metaphor_llm_processor.common.model.DocumentChunkStatus;
+import com.article.metaphor_llm_processor.common.model.DocumentChunkState;
 import com.article.metaphor_llm_processor.common.model.IndexedDocumentChunk;
 import com.article.metaphor_llm_processor.common.model.OriginType;
 import org.assertj.core.api.Assertions;
@@ -41,9 +41,9 @@ class DocumentIndexingConsumerTest {
 
         var documentChunkOne = new IndexedDocumentChunk(
                 "test-id-1", "test-document-id-1", "Test 1234567890",
-                DocumentChunkStatus.PENDING, 1, null, now, now, now, false);
+                DocumentChunkState.PENDING, 1, null, now, now, now, false);
         var documentChunkTwo = new IndexedDocumentChunk(
-                "test-id-2", "test-document-id-2", "Test 0987654321", DocumentChunkStatus.PENDING, 2,
+                "test-id-2", "test-document-id-2", "Test 0987654321", DocumentChunkState.PENDING, 2,
                 null, now, now, now, false
         );
         List<IndexedDocumentChunk> chunks = List.of(documentChunkOne, documentChunkTwo);

@@ -1,6 +1,6 @@
 package com.article.metaphor_llm_processor.article_indexer.indexing;
 
-import com.article.metaphor_llm_processor.common.model.DocumentChunkStatus;
+import com.article.metaphor_llm_processor.common.model.DocumentChunkState;
 import com.article.metaphor_llm_processor.common.model.IndexedDocumentChunk;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -23,7 +23,7 @@ class IndexingReportTest {
     public void testPassedWhenExceptionIsNotNull() {
         var now = Instant.now();
         var chunk = new IndexedDocumentChunk(
-                "test-id-1", "test-document-id-1", "Test 1234567890", DocumentChunkStatus.PENDING, 1,
+                "test-id-1", "test-document-id-1", "Test 1234567890", DocumentChunkState.PENDING, 1,
                 null, now, now, now, false
         );
 
@@ -37,7 +37,7 @@ class IndexingReportTest {
     public void testRetryableExceptionOccurredWhenExceptionIsNull() {
         var now = Instant.now();
         var chunk = new IndexedDocumentChunk(
-                "test-id-1", "test-document-id-1", "Test 1234567890", DocumentChunkStatus.PENDING, 1,
+                "test-id-1", "test-document-id-1", "Test 1234567890", DocumentChunkState.PENDING, 1,
                 null, now, now, now, false
         );
 
@@ -50,7 +50,7 @@ class IndexingReportTest {
     public void testRetryableExceptionOccurredWhenNotRetryable() {
         var now = Instant.now();
         var chunk = new IndexedDocumentChunk(
-                "test-id-1", "test-document-id-1", "Test 1234567890", DocumentChunkStatus.PENDING, 1,
+                "test-id-1", "test-document-id-1", "Test 1234567890", DocumentChunkState.PENDING, 1,
                 null, now, now, now, false
         );
 
@@ -65,7 +65,7 @@ class IndexingReportTest {
     public void testRetryableExceptionOccurredWhenRetryable() {
         var now = Instant.now();
         var chunk = new IndexedDocumentChunk(
-                "test-id-1", "test-document-id-1", "Test 1234567890", DocumentChunkStatus.PENDING, 1,
+                "test-id-1", "test-document-id-1", "Test 1234567890", DocumentChunkState.PENDING, 1,
                 null, now, now, now, false
         );
 
