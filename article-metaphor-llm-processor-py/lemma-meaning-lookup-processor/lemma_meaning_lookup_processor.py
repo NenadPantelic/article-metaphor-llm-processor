@@ -2,6 +2,7 @@ from client.chunk_processing_state_api_client import ChunkProcessingStateApiClie
 from common.config.logconfig import LogConfig
 from common.data.lexical_unit_data import LexicalUnitData
 from config.config_data import RabbitMQConfig
+from data.chunk_processing_state import ChunkProcessingState
 from data.lemma_with_explanations_data import LemmaWithExplanationsData
 from data.message import OutputMessage
 from dictionary_access_service import DictionaryAccessService
@@ -26,6 +27,9 @@ class LemmaMeaningRetrievalHandler(PipelineStepProcessor):
                          dictionary_access_service,
                          LexicalUnitData,
                          LemmaWithExplanationsData,
+                         ChunkProcessingState.LEMMA_MEANING_LOOKUP__IN_PROGRESS,
+                         ChunkProcessingState.LEMMA_MEANING_LOOKUP__COMPLETE,
+                         ChunkProcessingState.LEMMA_MEANING__FAILED,
                          chunk_processing_api_client)
 
     def _prepare_output_message(self, chunk_id: str, document_id: str, **kwargs) -> OutputMessage:

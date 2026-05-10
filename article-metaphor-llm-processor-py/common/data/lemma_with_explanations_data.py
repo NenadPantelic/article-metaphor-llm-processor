@@ -17,6 +17,7 @@ class LemmaWithExplanationsData(InputMessage, OutputMessage):
     document_id: str
     surface: str
     explanations: List[LemmaExplanations]
+    type: str = "lemma_meanings_data"
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -24,4 +25,5 @@ class LemmaWithExplanationsData(InputMessage, OutputMessage):
             "document_id": self.document_id,
             "surface": self.surface,
             "explanations": self.explanations,
+            "type": self.type,
         }

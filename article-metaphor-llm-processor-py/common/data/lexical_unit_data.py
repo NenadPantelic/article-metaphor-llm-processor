@@ -12,6 +12,7 @@ class LexicalUnitData(InputMessage, OutputMessage):
     # sentences: list[dict[str, Any]]
     lexical_units: list[dict[str, Any]]
     unique_lemmas: list[dict[str, Any]]
+    type: str = "lexical_unit_data"
 
     def serialize(self) -> bytes:
         return dumps(self.to_dict())
@@ -22,5 +23,6 @@ class LexicalUnitData(InputMessage, OutputMessage):
             "document_id": self.document_id,
             # "sentences": self.sentences,
             "lexical_units": self.lexical_units,
-            "unique_lemmas": self.unique_lemmas
+            "unique_lemmas": self.unique_lemmas,
+            "type": self.type,
         }

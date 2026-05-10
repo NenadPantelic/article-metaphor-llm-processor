@@ -12,6 +12,7 @@ class OutputMessage(ABC):
     def __init__(self, chunk_id: str, document_id: str, **kwargs):
         self.chunk_id = chunk_id
         self.document_id = document_id
+        self.type = None
 
     def serialize(self) -> bytes:
         return dumps(self.to_dict())
