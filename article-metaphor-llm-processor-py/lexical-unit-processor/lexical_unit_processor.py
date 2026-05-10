@@ -3,6 +3,7 @@ from common.config.logconfig import LogConfig
 from common.data.chunk import Chunk
 from common.data.lexical_unit_data import LexicalUnitData
 from config.config_data import RabbitMQConfig
+from data.chunk_processing_state import ChunkProcessingState
 from exception.invalid_data_exception import InvalidDataException
 from lexical_unit_processing_service import LexicalUnitTextPreprocessor
 from processor.pipeline_step_processor import PipelineStepProcessor
@@ -26,6 +27,9 @@ class LexicalUnitProcessor(PipelineStepProcessor):
                          text_processor,
                          Chunk,
                          LexicalUnitData,
+                         ChunkProcessingState.LEXICAL_UNIT_PROCESSING__IN_PROGRESS,
+                         ChunkProcessingState.LEXICAL_UNIT_PROCESSING__COMPLETE,
+                         ChunkProcessingState.LEXICAL_UNIT_PROCESSING__FAILED,
                          chunk_processing_api_client)
 
     def _prepare_output_message(self, chunk_id: str, document_id: str, **kwargs) -> OutputMessage:

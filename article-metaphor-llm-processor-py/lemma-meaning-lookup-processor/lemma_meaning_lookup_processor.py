@@ -38,7 +38,6 @@ class LemmaMeaningRetrievalHandler(PipelineStepProcessor):
             raise InvalidDataException("Meanings attribute not present and it is required.")
 
         return LemmaWithExplanationsData(
-
             chunk_id=chunk_id,
             document_id=document_id,
             surface="",
