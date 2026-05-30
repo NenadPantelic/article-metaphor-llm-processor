@@ -1,0 +1,100 @@
+from dataclasses import dataclass
+
+from config.config import Config
+
+# MongoDB section/keys
+_DB_SECTION = "db"
+_DB_HOST_KEY = "host"
+_DB_PORT_KEY = "port"
+_DB_USERNAME_KEY = "username"
+_DB_PASSWORD_KEY = "password"
+_DB_DATABASE_KEY = "database"
+_DB_CHUNKS_COLLECTION_KEY = "chunks_collection"
+_DB_CHUNK_PROCESSING_STATE_COLLECTION_KEY = "chunk_processing_state_collection"
+
+# RabbitMQ section/key and default values
+_RABBITMQ_SECTION = "rabbitmq"
+_RABBITMQ_HOST_KEY = "host"
+_RABBITMQ_PORT_KEY = "port"
+_RABBITMQ_VHOST_KEY = "vhost"
+_RABBITMQ_USERNAME_KEY = "username"
+_RABBITMQ_PASSWORD_KEY = "password"
+
+_DEFAULT_HOST = "localhost"
+_DEFAULT_RABBITMQ_PORT = 5672
+
+# Cache section/keys and default values
+_CACHE_SECTION = "cache"
+_CACHE_HOST_KEY = "host"
+_CACHE_PORT_KEY = "port"
+_CACHE_USERNAME_KEY = "username"
+_CACHE_PASSWORD_KEY = "password"
+_DEFAULT_CACHE_HOST = "127.0.0.1"
+_DEFAULT_CACHE_PORT = 6379
+
+
+# timeouts
+
+@dataclass
+class RabbitMQConfig:
+    host: str
+    port: int
+    vhost: str
+    username: str
+    password: str
+
+    @staticmethod
+    def from_config(_config):
+        rabbit_section = _config[_RABBITMQ_SECTION]
+
+        host = rabbit_section.get(_RABBITMQ_HOST_KEY)
+        port = rabbit_section.get(_RABBITMQ_PORT_KEY)
+        vhost = rabbit_section.get(_RABBITMQ_VHOST_KEY)
+        username = rabbit_section.get(_RABBITMQ_USERNAME_KEY)
+        password = rabbit_section.get(_RABBITMQ_PASSWORD_KEY)
+
+        return RabbitMQConfig(host=host, port=port, vhost=vhost, username=username, password=password)
+
+
+@dataclass
+class DatabaseConfig:
+    host: str
+    port: int
+    username: str
+    password: str
+    database: str
+    chunks_collection: str
+    chunk_processing_state_collection: str
+
+    @staticmethod
+    def from_config(_config: Config):
+        db_section = _config[_DB_SECTION]
+
+        db_host = db_section.get(_DB_HOST_KEY)
+        db_port = db_section.get(_DB_PORT_KEY)
+        db_username = db_section.get(_DB_USERNAME_KEY)
+        db_password = db_section.get(_DB_PASSWORD_KEY)
+        db_chunks_collection = db_section.get(_DB_CHUNKS_COLLECTION_KEY)
+        db_chunk_processing_state_collection = db_section.get(_DB_CHUNK_PROCESSING_STATE_COLLECTION_KEY)
+
+        return DatabaseConfig(db_host, db_port, db_username, db_password, db_chunks_collection,
+                              db_chunk_processing_state_collection)
+
+
+@dataclass
+class CacheConfig:
+    host: str
+    port: int
+    username: str
+    password: str
+
+    @staticmethod
+    def from_config(_config):
+        cache_section = _config[_CACHE_SECTION]
+
+        host = cache_section.get(_CACHE_HOST_KEY)
+        port = cache_section.get(_CACHE_PORT_KEY)
+        username = cache_section.get(_CACHE_USERNAME_KEY, _DEFAULT_CACHE_HOST)
+        password = cache_section.get(_CACHE_PASSWORD_KEY, _DEFAULT_CACHE_PORT)
+
+        return CacheConfig(host=host, port=port, username=username, password=password)

@@ -1,0 +1,2 @@
+class ProcessorException(Exception):
+    pass
