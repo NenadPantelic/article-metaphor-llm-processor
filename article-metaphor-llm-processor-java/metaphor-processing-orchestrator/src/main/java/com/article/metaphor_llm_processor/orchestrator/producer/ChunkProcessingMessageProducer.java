@@ -1,8 +1,7 @@
 package com.article.metaphor_llm_processor.orchestrator.producer;
 
-import com.article.metaphor_llm_processor.common.dto.processing.ChunkProcessingData;
-import com.article.metaphor_llm_processor.common.dto.processing.in.DocumentChunk;
 import com.article.metaphor_llm_processor.orchestrator.configproperties.ProcessingConfigProperties;
+import com.article.metaphor_llm_processor.orchestrator.dto.PipelineMessage;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Component;
@@ -20,9 +19,8 @@ public class ChunkProcessingMessageProducer {
         this.exchange = processingConfigProperties.lexicalUnitProcessingExchange();
     }
 
-    public void sendMessage(String routingKey,
-                            ChunkProcessingData chunkProcessingData) {
-        log.info("Sending {}...", chunkProcessingData);
-        rabbitTemplate.convertAndSend(exchange, routingKey, chunkProcessingData);
+    public void sendMessage(PipelineMessage pipelineMessage) {
+        log.info("Sending {}...", pipelineMessage);
+        rabbitTemplate.convertAndSend(exchange, pipelineMessage);
     }
 }

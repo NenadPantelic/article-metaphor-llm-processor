@@ -54,7 +54,7 @@ public class DocumentIndexingServiceImpl implements DocumentIndexingService {
                     indexedDocument.getId(), indexedDocument.getName(), chunks.size()
             );
             // the document is now ready for processing
-            indexedDocument.setState(DocumentState.PENDING);
+            indexedDocument.setState(DocumentState.PENDING_PROCESSING);
             documentRepository.save(indexedDocument);
             return chunks;
         } catch (MalformedURLException e) {

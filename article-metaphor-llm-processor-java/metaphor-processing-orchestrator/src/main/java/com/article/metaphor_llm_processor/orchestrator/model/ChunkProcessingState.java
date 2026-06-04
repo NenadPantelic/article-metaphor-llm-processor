@@ -1,17 +1,19 @@
-package com.article.metaphor_llm_processor.chunk_processing.state_manager.model;
+package com.article.metaphor_llm_processor.orchestrator.model;
 
 import jakarta.validation.constraints.NotBlank;
+import lombok.Builder;
 import lombok.Data;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.time.Instant;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 
+@Builder
 @Data
 @Document("chunk_processing_states")
 public class ChunkProcessingState {
@@ -24,13 +26,18 @@ public class ChunkProcessingState {
     private String chunkId;
 
     @NotBlank
-    private String documentId;
+    private ProcessingMilestone reachedMilestone;
 
-    @NotBlank
-    private String state;
+    private Instant lastExecutionTimestamp;
 
-    @Field("data")
-    private Map<String, Object> data;
+    private boolean failedOnLastExecution;
+
+    @Builder.Default
+    private List<ChunkProcessingError> errors = new ArrayList<>();
+
+    // if the state record is inactive, it cannot be used in processing
+    @Builder.Default
+    private boolean active = true;
 
     @CreatedDate
     private Instant createdAt;
@@ -38,4 +45,11 @@ public class ChunkProcessingState {
     @LastModifiedDate
     private Instant updatedAt;
 
+    public void addError(ChunkProcessingError error) {
+        errors.add(error);
+    }
+
+    public void deactivate() {
+        setActive(false);
+    }
 }

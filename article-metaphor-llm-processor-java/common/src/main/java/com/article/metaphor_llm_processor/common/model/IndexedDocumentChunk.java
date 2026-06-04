@@ -13,8 +13,6 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
 
 @AllArgsConstructor
 @Builder
@@ -25,41 +23,26 @@ public class IndexedDocumentChunk {
 
     @Id
     private String id;
+
     @NotBlank
     private String documentId;
+
     @NotBlank
     private String text;
+
     @Builder.Default
-    private DocumentChunkState state = DocumentChunkState.PENDING;
+    private DocumentChunkState state = DocumentChunkState.PENDING_PROCESSING;
+
     @NotNull
     @Min(1)
     @Builder.Default
     private int order = 1;
-    @Builder.Default
-    private List<ChunkProcessingAttempt> failedAttempts = new ArrayList<>();
+
+    private Instant processingStartedAt;
+
     @CreatedDate
     private Instant createdAt;
+
     @LastModifiedDate
     private Instant updatedAt;
-    // to check stuck chunks
-    private Instant lastProcessingAttemptedAt;
-    // to avoid nested fields scanning
-    @Builder.Default
-    private boolean isLastAttemptReprocessable = false;
-
-    public void addFailedAttempt(ChunkProcessingAttempt chunkProcessingAttempt) {
-        this.failedAttempts.add(chunkProcessingAttempt);
-    }
-
-    public void clearAllFailedAttempts() {
-        failedAttempts.clear();
-    }
-
-    public boolean hasPreviousAttempts() {
-        return failedAttempts != null && !failedAttempts.isEmpty();
-    }
-
-    public ProcessingMilestone getMilestone() {
-        return this.getState().getMilestone();
-    }
 }
