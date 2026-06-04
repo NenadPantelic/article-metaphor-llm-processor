@@ -1,13 +1,19 @@
 package com.article.metaphor_llm_processor.orchestrator.statemanager;
 
-import com.article.metaphor_llm_processor.common.model.*;
+import com.article.metaphor_llm_processor.common.model.DocumentChunkState;
+import com.article.metaphor_llm_processor.common.model.DocumentState;
+import com.article.metaphor_llm_processor.common.model.IndexedDocument;
+import com.article.metaphor_llm_processor.common.model.IndexedDocumentChunk;
 import com.article.metaphor_llm_processor.common.repository.IndexedDocumentChunkRepository;
 import com.article.metaphor_llm_processor.common.repository.IndexedDocumentRepository;
+import com.article.metaphor_llm_processor.orchestrator.model.ChunkProcessingError;
+import com.article.metaphor_llm_processor.orchestrator.model.ChunkProcessingState;
+import com.article.metaphor_llm_processor.orchestrator.repository.ChunkProcessingStateRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
-import java.util.List;
 import java.util.Optional;
 
 @Slf4j
@@ -16,37 +22,32 @@ public class StateManager {
 
     private final IndexedDocumentRepository documentRepository;
     private final IndexedDocumentChunkRepository chunkRepository;
+    private final ChunkProcessingStateRepository chunkProcessingStateRepository;
 
-    public StateManager(IndexedDocumentRepository documentRepository, IndexedDocumentChunkRepository chunkRepository) {
+    public StateManager(IndexedDocumentRepository documentRepository,
+                        IndexedDocumentChunkRepository chunkRepository,
+                        ChunkProcessingStateRepository chunkProcessingStateRepository) {
         this.documentRepository = documentRepository;
         this.chunkRepository = chunkRepository;
+        this.chunkProcessingStateRepository = chunkProcessingStateRepository;
     }
 
-    public void failChunkAndSucceedingChunks(IndexedDocumentChunk startingChunk, String errorMessage) {
-        List<IndexedDocumentChunk> chunks = chunkRepository.findByDocumentIdAndOrderGreaterThanOrEq(
-                startingChunk.getDocumentId(), startingChunk.getOrder()
-        );
-        Instant now = Instant.now();
-
-        chunks.forEach(chunk -> {
-            chunk.setLastProcessingAttemptedAt(now);
-            chunk.setState(DocumentChunkState.PROCESSING_FAILED);
-            chunk.addFailedAttempt(
-                    new ChunkProcessingAttempt(now, errorMessage, chunk.getMilestone())
-            );
-        });
-
-        chunkRepository.saveAll(chunks);
-    }
-
+    @Transactional
     public void failChunk(IndexedDocumentChunk chunk,
                           String errorMessage) {
         Instant now = Instant.now();
-        chunk.setLastProcessingAttemptedAt(now);
-        chunk.setState(DocumentChunkState.PROCESSING_FAILED);
-        chunk.addFailedAttempt(
-                new ChunkProcessingAttempt(now, errorMessage, chunk.getMilestone())
+        ChunkProcessingState chunkProcessingState = chunkProcessingStateRepository.findByChunkId(chunk.getId()).orElse(
+                ChunkProcessingState.builder()
+                        .chunkId(chunk.getId())
+                        .build()
         );
+
+        chunkProcessingState.setFailedOnLastExecution(true);
+        chunkProcessingState.setLastExecutionTimestamp(now);
+        chunkProcessingState.addError(new ChunkProcessingError(errorMessage, now, null));
+        chunkProcessingState.deactivate();
+        chunk.setState(DocumentChunkState.FAILED);
+        chunkProcessingStateRepository.save(chunkProcessingState);
         chunkRepository.save(chunk);
     }
 
@@ -72,8 +73,8 @@ public class StateManager {
         if (successfullyProcessedCount + processingFailuresCount == allChunksCount) {
             log.info("All chunks of a document[id = {}] are processed.", documentId);
             DocumentState documentState = processingFailuresCount == 0 ?
-                    DocumentState.DONE :
-                    DocumentState.INCOMPLETE;
+                    DocumentState.PROCESSED_SUCCESSFULLY :
+                    DocumentState.PROCESSED_INCOMPLETE;
             document.setState(documentState);
             documentRepository.save(document);
         }
