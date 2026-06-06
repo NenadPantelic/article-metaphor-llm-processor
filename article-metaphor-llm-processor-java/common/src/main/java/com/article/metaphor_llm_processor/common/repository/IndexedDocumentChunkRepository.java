@@ -11,26 +11,14 @@ import java.util.Optional;
 
 public interface IndexedDocumentChunkRepository extends MongoRepository<IndexedDocumentChunk, String> {
 
-    @Aggregation(pipeline = {
-            "{$match: { 'documentId': ?0, 'state': {$in: ['PENDING', 'NEXT_ATTEMPT_NEEDED', 'PENDING_REPROCESSING']}}}",
-            "{$sort: {'order': 1}}",
-            "{$limit: 1}"
-    })
+    @Aggregation(pipeline = {"{$match: { 'documentId': ?0, 'state': {$in: ['PENDING', 'NEXT_ATTEMPT_NEEDED', 'PENDING_REPROCESSING']}}}", "{$sort: {'order': 1}}", "{$limit: 1}"})
     Optional<IndexedDocumentChunk> findFirstChunkEligibleForProcessingByDocumentId(String documentId);
 
 
-    @Aggregation(pipeline = {
-            "{$match: { 'state': 'PENDING'}}",
-            "{$sort: {'order': 1}}",
-            "{$limit: 1}"
-    })
+    @Aggregation(pipeline = {"{$match: { 'state': 'PENDING'}}", "{$sort: {'order': 1}}", "{$limit: 1}"})
     Optional<IndexedDocumentChunk> findFirstChunkEligibleForProcessing();
 
-    @Aggregation(pipeline = {
-            "{$match: { 'state': {$in: ['ANOTHER_ATTEMPT_NEEDED', 'PENDING_REPROCESSING']}}}",
-            "{$sort: {'order': 1}}",
-            "{$limit: 1}"
-    })
+    @Aggregation(pipeline = {"{$match: { 'state': {$in: ['ANOTHER_ATTEMPT_NEEDED', 'PENDING_REPROCESSING']}}}", "{$sort: {'order': 1}}", "{$limit: 1}"})
     Optional<IndexedDocumentChunk> findFirstChunkEligibleForReprocessing();
 
 
@@ -44,12 +32,7 @@ public interface IndexedDocumentChunkRepository extends MongoRepository<IndexedD
     @Query(value = "{'state': 'FAILED_TO_PROCESS'}", count = true)
     int countProcessingFailuresByDocumentId(String documentId);
 
-    @Aggregation(pipeline = {
-            "{$match: { 'documentId': ?0, 'order': {$lt: ?1}}}",
-            "{$project: { 'length': { '$strLenCP': '$text'}}}",
-            "{$group: {'_id': null, 'totalLength': {'$sum': '$length'}}}",
-            "{$project: { 'totalLength': 1, '_id': 0}}"
-    })
+    @Aggregation(pipeline = {"{$match: { 'documentId': ?0, 'order': {$lt: ?1}}}", "{$project: { 'length': { '$strLenCP': '$text'}}}", "{$group: {'_id': null, 'totalLength': {'$sum': '$length'}}}", "{$project: { 'totalLength': 1, '_id': 0}}"})
     Integer findCumulativeLengthOfPreviousChunks(String documentId, int order);
 
 
@@ -60,18 +43,10 @@ public interface IndexedDocumentChunkRepository extends MongoRepository<IndexedD
     @Query("{ '_documentId': ?0, 'order': {$gte: ?1 }}")
     List<IndexedDocumentChunk> findByDocumentIdAndOrderGreaterThanOrEq(String documentId, int order);
 
-    @Aggregation(pipeline = {
-            """
-                    {$match: {
-                     'state': {
-                           $in: ['STARTED_PROCESSING', 'LEXICAL_UNIT_PROCESSING__PENDING',
-                           'LEXICAL_UNIT_PROCESSING__IN_PROGRESS', 'DICTIONARY_ACCESS__PENDING',
-                           'DICTIONARY_ACCESS__IN_PROGRESS', 'METAPHOR_ANALYSIS__PENDING', 'METAPHOR_ANALYSIS__IN_PROGRESS'
-                           ]},
-                           'lastProcessingAttemptedAt': {$gte: ?1}}
-                           """,
-            "{$limit: ?2}"
-    })
+    @Aggregation(pipeline = {"""
+            {$match: {
+                'state': {$in: ['PROCESSING', 'REPROCESSING']},'processingStartedAt': {$gte: ?1}},
+                   """, "{$limit: ?2}"})
         // Example:
         // now: 19:00
         // time limit: 6h

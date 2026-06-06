@@ -1,7 +1,5 @@
 package com.article.metaphor_llm_processor.orchestrator.orchestrator;
 
-import com.article.metaphor_llm_processor.common.dto.processing.ChunkProcessingData;
-import com.article.metaphor_llm_processor.common.dto.processing.in.DocumentChunk;
 import com.article.metaphor_llm_processor.common.model.DocumentChunkState;
 import com.article.metaphor_llm_processor.common.model.DocumentState;
 import com.article.metaphor_llm_processor.common.model.IndexedDocument;
@@ -9,7 +7,9 @@ import com.article.metaphor_llm_processor.common.model.IndexedDocumentChunk;
 import com.article.metaphor_llm_processor.common.repository.IndexedDocumentChunkRepository;
 import com.article.metaphor_llm_processor.common.repository.IndexedDocumentRepository;
 import com.article.metaphor_llm_processor.orchestrator.configproperties.ProcessingConfigProperties;
+import com.article.metaphor_llm_processor.orchestrator.dto.ProcessingMessage;
 import com.article.metaphor_llm_processor.orchestrator.producer.ChunkProcessingMessageProducer;
+import com.article.metaphor_llm_processor.orchestrator.repository.ChunkProcessingStateRepository;
 import com.article.metaphor_llm_processor.orchestrator.statemanager.StateManager;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -23,7 +23,7 @@ import java.util.Optional;
 public class MetaphorProcessingOrchestrator extends ProcessingOrchestrator {
 
     private static final Map<DocumentState, DocumentState> DOCUMENT_STATUS_TRANSITION_MAP = Map.of(
-            DocumentState.PENDING, DocumentState.PROCESSING,
+            DocumentState.PENDING_PROCESSING, DocumentState.PROCESSING,
             DocumentState.PENDING_REPROCESSING, DocumentState.REPROCESSING
     );
 
@@ -32,8 +32,15 @@ public class MetaphorProcessingOrchestrator extends ProcessingOrchestrator {
                                           IndexedDocumentChunkRepository chunkRepository,
                                           StateManager stateManager,
                                           ChunkProcessingMessageProducer chunkProcessingMessageProducer,
+                                          ChunkProcessingStateRepository chunkProcessingStateRepository,
                                           ProcessingConfigProperties processingConfigProperties) {
-        super(documentRepository, chunkRepository, chunkProcessingMessageProducer, stateManager, processingConfigProperties);
+        super(documentRepository,
+                chunkRepository,
+                chunkProcessingMessageProducer,
+                stateManager,
+                chunkProcessingStateRepository,
+                processingConfigProperties
+        );
     }
 
 
@@ -60,7 +67,7 @@ public class MetaphorProcessingOrchestrator extends ProcessingOrchestrator {
         );
         if (chunkOptional.isEmpty()) {
             log.info("There is no chunk waiting to be processed...");
-            document.setState(DocumentState.INCOMPLETE); // should not happen
+            document.setState(DocumentState.PROCESSED_INCOMPLETE); // should not happen
             documentRepository.save(document);
             return;
         }
@@ -69,12 +76,10 @@ public class MetaphorProcessingOrchestrator extends ProcessingOrchestrator {
         String chunkId = chunkToProcess.getId();
         String chunkDocumentId = chunkToProcess.getDocumentId();
         log.info("Chunk[id = {}, documentId = {}] is about to be processed.", chunkId, chunkDocumentId);
-        doProcess(chunkToProcess, DocumentChunkState.STARTED_PROCESSING);
-    }
-
-    @Override
-    ChunkProcessingData createChunkProcessingData(IndexedDocumentChunk chunk) {
-        return new DocumentChunk(chunk.getDocumentId(), chunk.getId(), chunk.getText());
+        doProcess(chunkToProcess,
+                DocumentChunkState.PROCESSING,
+                new ProcessingMessage(chunkId, chunkToProcess.getText())
+        );
     }
 
     void updateDocumentStateIfNeeded(IndexedDocument document) {
