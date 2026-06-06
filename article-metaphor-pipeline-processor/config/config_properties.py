@@ -1,6 +1,5 @@
+from configparser import RawConfigParser
 from dataclasses import dataclass
-
-from config.config import Config
 
 # MongoDB section/keys
 _DB_SECTION = "db"
@@ -44,11 +43,11 @@ class RabbitMQConfig:
     password: str
 
     @staticmethod
-    def from_config(_config):
-        rabbit_section = _config[_RABBITMQ_SECTION]
+    def from_config(_config: RawConfigParser):
+        rabbit_section = _config.get_section(_RABBITMQ_SECTION)
 
         host = rabbit_section.get(_RABBITMQ_HOST_KEY)
-        port = rabbit_section.get(_RABBITMQ_PORT_KEY)
+        port = rabbit_section.getint(_RABBITMQ_PORT_KEY)
         vhost = rabbit_section.get(_RABBITMQ_VHOST_KEY)
         username = rabbit_section.get(_RABBITMQ_USERNAME_KEY)
         password = rabbit_section.get(_RABBITMQ_PASSWORD_KEY)
@@ -67,17 +66,18 @@ class DatabaseConfig:
     chunk_processing_state_collection: str
 
     @staticmethod
-    def from_config(_config: Config):
+    def from_config(_config: RawConfigParser):
         db_section = _config[_DB_SECTION]
 
         db_host = db_section.get(_DB_HOST_KEY)
-        db_port = db_section.get(_DB_PORT_KEY)
+        db_port = db_section.getint(_DB_PORT_KEY)
         db_username = db_section.get(_DB_USERNAME_KEY)
         db_password = db_section.get(_DB_PASSWORD_KEY)
+        db_database = db_section.get(_DB_DATABASE_KEY)
         db_chunks_collection = db_section.get(_DB_CHUNKS_COLLECTION_KEY)
         db_chunk_processing_state_collection = db_section.get(_DB_CHUNK_PROCESSING_STATE_COLLECTION_KEY)
 
-        return DatabaseConfig(db_host, db_port, db_username, db_password, db_chunks_collection,
+        return DatabaseConfig(db_host, db_port, db_username, db_password, db_database, db_chunks_collection,
                               db_chunk_processing_state_collection)
 
 
@@ -89,11 +89,11 @@ class CacheConfig:
     password: str
 
     @staticmethod
-    def from_config(_config):
+    def from_config(_config: RawConfigParser):
         cache_section = _config[_CACHE_SECTION]
 
         host = cache_section.get(_CACHE_HOST_KEY)
-        port = cache_section.get(_CACHE_PORT_KEY)
+        port = cache_section.getint(_CACHE_PORT_KEY, 0)
         username = cache_section.get(_CACHE_USERNAME_KEY, _DEFAULT_CACHE_HOST)
         password = cache_section.get(_CACHE_PASSWORD_KEY, _DEFAULT_CACHE_PORT)
 
