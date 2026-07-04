@@ -3,10 +3,9 @@ from typing import Any, Union
 
 from requests import Session
 
+from config.logconfig import get_logger
 from exception.client_exception import ClientException
 from helper.serialization import serialize_body, deserialize_body
-
-X_SERVICE_KEY_HEADER = "X-service-key"
 
 
 class HttpMethod(Enum):
@@ -14,6 +13,9 @@ class HttpMethod(Enum):
     POST = "POST"
     PUT = "PUT"
     DELETE = "DELETE"
+
+
+logger = get_logger()
 
 
 class HttpClient:
@@ -34,7 +36,8 @@ class HttpClient:
     def _call(self, method: HttpMethod, endpoint: str, body: dict[str, Any] = None, headers=None, to_json=True) -> \
             Union[dict[str, Any], str]:
         url = f"{self._url}/{endpoint}"
-        payload = serialize_body(body)
+        logger.debug(f"Calling {method} and URL {url}")
+        payload = serialize_body(body) if body else None
 
         response = None
         match method:
