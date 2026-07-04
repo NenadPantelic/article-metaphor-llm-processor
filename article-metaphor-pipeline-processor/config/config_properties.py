@@ -1,6 +1,10 @@
 from configparser import RawConfigParser
 from dataclasses import dataclass
 
+# Service section/keys
+_SERVICE_SECTION = "service"
+_SERVICE_NAME_KEY = "name"
+
 # MongoDB section/keys
 _DB_SECTION = "db"
 _DB_HOST_KEY = "host"
@@ -31,8 +35,27 @@ _CACHE_PASSWORD_KEY = "password"
 _DEFAULT_CACHE_HOST = "127.0.0.1"
 _DEFAULT_CACHE_PORT = 6379
 
+# Lemma meaning cache section/keys
+_LDOCE_SECTION = "ldoce"
+_CAMBRIDGE_SECTION = "cambridge"
+
+_BUCKET_KEY = "cache-key"
+
 
 # timeouts
+
+
+@dataclass
+class ServiceConfig:
+    name: str
+
+    @staticmethod
+    def from_config(_config: RawConfigParser):
+        service_section = _config[_SERVICE_SECTION]
+        name = service_section.get(_SERVICE_NAME_KEY)
+
+        return ServiceConfig(name=name)
+
 
 @dataclass
 class RabbitMQConfig:
@@ -98,3 +121,27 @@ class CacheConfig:
         password = cache_section.get(_CACHE_PASSWORD_KEY, _DEFAULT_CACHE_PORT)
 
         return CacheConfig(host=host, port=port, username=username, password=password)
+
+
+@dataclass
+class LemmaMeaningsCacheConfig(CacheConfig):
+    host: str
+    port: int
+    username: str
+    password: str
+    ldoce_cache_key: str
+    cambridge_cache_key: str
+
+    @staticmethod
+    def from_config(_config):
+        cache_config = CacheConfig.from_config(_config)
+
+        ldoce_section = _config[_LDOCE_SECTION]
+        ldoce_cache_key = ldoce_section.get(_BUCKET_KEY)
+
+        cambridge_section = _config[_CAMBRIDGE_SECTION]
+        cambridge_cache_key = cambridge_section.get(_BUCKET_KEY)
+
+        return LemmaMeaningsCacheConfig(host=cache_config.host, port=cache_config.port, username=cache_config.username,
+                                        password=cache_config.password, ldoce_cache_key=ldoce_cache_key,
+                                        cambridge_cache_key=cambridge_cache_key)
