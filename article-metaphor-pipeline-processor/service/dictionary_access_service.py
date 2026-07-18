@@ -104,7 +104,6 @@ class DictionaryAccessService:
         results = {}
 
         for lemma in lemmas:
-            print(f"NP: {lemma}")
             cambridge_defs = self._lookup_cambridge(lemma)
             log.debug(f"Cambridge defs: {cambridge_defs}")
             time.sleep(REQUEST_DELAY)

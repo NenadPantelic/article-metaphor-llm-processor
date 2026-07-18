@@ -15,11 +15,16 @@ class BaseRepository:
         self._entity_type = entity_type
         self._entity_name = self._entity_type.__name__
 
-    def find(self, query: dict):
+    def find_one(self, query: dict):
         log.debug(f"Trying to find a {self._entity_name} by: {query}")
         record = self._collection.find_one(query)
         log.debug(f"Found: {record}")
         return self._entity_type(**record) if record else None
+
+    def find(self):
+        log.debug(f"Retrieving all {self._entity_name} records")
+        documents = self._collection.find({})
+        return [self._entity_type(**doc) for doc in documents]
 
     def save(self, query: dict, updated_record: dict):
         log.debug(f"Upserting the {self._entity_name}. Query = {query}, new record = {updated_record}")

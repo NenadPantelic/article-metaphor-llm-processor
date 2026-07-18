@@ -13,5 +13,5 @@ class StepProcessor(ABC):
         return self._milestone
 
     @abstractmethod
-    def execute(self, message: ProcessingData) -> ProcessingData:
+    def execute(self, message: ProcessingData, **kwargs) -> ProcessingData:
         pass

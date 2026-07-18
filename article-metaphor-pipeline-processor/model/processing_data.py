@@ -1,7 +1,7 @@
 import abc
 from dataclasses import dataclass
 from datetime import datetime
-from typing import List, Any
+from typing import Any
 
 from util.time_util import utc_now
 
@@ -55,8 +55,15 @@ class LexicalUnitProcessingData(ProcessingData):
 @dataclass
 class LemmaExplanations:
     lemma: str
-    cambridge_explanation: list[str]
-    ldoce_explanation: list[str]
+    cambridge_explanations: list[str]
+    ldoce_explanations: list[str]
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "lemma": self.lemma,
+            "cambridge_explanations": self.cambridge_explanations,
+            "ldoce_explanations": self.ldoce_explanations,
+        }
 
 
 @dataclass
