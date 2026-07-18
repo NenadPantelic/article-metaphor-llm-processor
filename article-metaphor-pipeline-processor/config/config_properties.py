@@ -1,3 +1,4 @@
+import os
 from configparser import RawConfigParser
 from dataclasses import dataclass
 
@@ -40,6 +41,24 @@ _LDOCE_SECTION = "ldoce"
 _CAMBRIDGE_SECTION = "cambridge"
 
 _BUCKET_KEY = "cache-key"
+
+# Assistant section/keys and default values
+_ASSISTANT_SECTION = "assistant"
+_ASSISTANT_NAME_KEY = "name"
+_ASSISTANT_MODEL_KEY = "model"
+
+_ASSISTANT_START_CONVERSATION_INSTRUCTION_KEY = "start_conversation_instruction"
+_ASSISTANT_START_CONVERSATION_INSTRUCTION_FILE_PATH_KEY = "start_conversation_instruction_file_path"
+
+_ASSISTANT_PROMPT_TEMPLATE_KEY = "assistant_prompt_template"
+_ASSISTANT_PROMPT_TEMPLATE_FILE_KEY = "assistant_prompt_template_path"
+
+_ASSISTANT_OPEN_API_KEY = "api_key"
+_OPEN_API_KEY_ENV_VARIABLE = "OPENAI_API_KEY"
+
+_DEFAULT_NAME = "MIPVU Metaphor Annotator"
+_DEFAULT_MODEL = "gpt-4.1-mini"
+_DEFAULT_INSTRUCTIONS = ""
 
 
 # timeouts
@@ -145,3 +164,42 @@ class LemmaMeaningsCacheConfig(CacheConfig):
         return LemmaMeaningsCacheConfig(host=cache_config.host, port=cache_config.port, username=cache_config.username,
                                         password=cache_config.password, ldoce_cache_key=ldoce_cache_key,
                                         cambridge_cache_key=cambridge_cache_key)
+
+
+def read_env_variable(env_variable: str) -> str:
+    """
+    Reads the environment variable and returns its value.
+
+    :param env_variable: the environment variable to read
+    :return: value of the environment variable
+    """
+    return os.environ.get(env_variable)
+
+
+@dataclass
+class AssistantConfig:
+    name: str = _DEFAULT_NAME
+    model: str = _DEFAULT_MODEL
+    start_conversation_instruction: str = ""
+    assistant_prompt_template: str = ""
+    api_key: str = ""
+
+    @staticmethod
+    def from_config(_config):
+        assistant_section = _config[_ASSISTANT_SECTION]
+        name = assistant_section.get(_ASSISTANT_NAME_KEY)
+        model = assistant_section.get(_ASSISTANT_MODEL_KEY)
+        start_conversation_instruction = assistant_section.get(_ASSISTANT_START_CONVERSATION_INSTRUCTION_KEY)
+        prompt = assistant_section.get(_ASSISTANT_PROMPT_TEMPLATE_KEY)
+        api_key = assistant_section.get(_ASSISTANT_OPEN_API_KEY) or read_env_variable(_OPEN_API_KEY_ENV_VARIABLE)
+
+        if not start_conversation_instruction:
+            with open(assistant_section.get(_ASSISTANT_START_CONVERSATION_INSTRUCTION_FILE_PATH_KEY), "r") as f:
+                start_conversation_instruction = f.read()
+
+        if not prompt:
+            with open(assistant_section.get(_ASSISTANT_PROMPT_TEMPLATE_FILE_KEY), "r") as f:
+                prompt = f.read()
+
+        return AssistantConfig(name=name, model=model, start_conversation_instruction=start_conversation_instruction,
+                               assistant_prompt_template=prompt, api_key=api_key)

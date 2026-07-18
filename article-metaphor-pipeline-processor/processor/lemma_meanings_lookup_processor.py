@@ -20,8 +20,8 @@ class LemmaMeaningsLookupProcessor(StepProcessor):
         lemma_explanations_list = []
 
         for lemma, meanings in lemma_meanings.items():
-            lemma_explanations = LemmaExplanations(lemma, cambridge_explanation=meanings.get("cambridge"),
-                                                   ldoce_explanation=meanings.get("ldoce"))
+            lemma_explanations = LemmaExplanations(lemma, cambridge_explanations=meanings.get("cambridge"),
+                                                   ldoce_explanations=meanings.get("ldoce"))
             lemma_explanations_list.append(lemma_explanations)
 
         return LemmasWithExplanations(lemma_explanations_list)

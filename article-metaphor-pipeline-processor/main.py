@@ -1,25 +1,31 @@
 import uuid
 
-from cache.lemma_meaning_cache import LemmaMeaningsCache
 from config.config import get_config
-from config.config_properties import DatabaseConfig, ServiceConfig, LemmaMeaningsCacheConfig
+from config.config_properties import DatabaseConfig, ServiceConfig, LemmaMeaningsCacheConfig, AssistantConfig
 from config.logconfig import get_logger
 
+# To initialize the logger first
+config = get_config("config.ini")
+service_config = ServiceConfig.from_config(config)
+assistant_config = AssistantConfig.from_config(config)
+# lemma_meanings_cache_config = LemmaMeaningsCacheConfig.from_config(config)
+
+logger = get_logger(service_config.name)
+
+
 from db.repository.chunk_processing_state_repository import ChunkProcessingStateRepository
+from db.repository.conversation_repository import ConversationRepository
 from db.client.mongodb_client import MongoDBClient
 
 from model.chunk_processing_state import ChunkProcessingState
 from model.processing_data import RawMessage
+
+from cache.lemma_meaning_cache import LemmaMeaningsCache
 from processor.lemma_meanings_lookup_processor import LemmaMeaningsLookupProcessor
 from processor.lexical_unit_processor import LexicalUnitProcessor
 from service.dictionary_access_service import DictionaryAccessService
+from processor.metaphor_analysis_processor import MetaphorAnalysisProcessor
 from util.time_util import utc_now
-
-config = get_config("config.ini")
-service_config = ServiceConfig.from_config(config)
-# lemma_meanings_cache_config = LemmaMeaningsCacheConfig.from_config(config)
-
-logger = get_logger(service_config.name)
 
 if __name__ == "__main__":
     example_text = (
@@ -55,3 +61,9 @@ if __name__ == "__main__":
     lemma_meaning_lookup_processor = LemmaMeaningsLookupProcessor()
     lemmas_with_meanings = lemma_meaning_lookup_processor.execute(lexical_unit_processing_result)
     print(lemmas_with_meanings)
+
+    conversation_repository = ConversationRepository(mongo_client, "conversations")
+    metaphor_analysis_processor = MetaphorAnalysisProcessor(assistant_config=assistant_config,
+                                                            conversation_repository=conversation_repository)
+
+    metaphor_analysis_processor.execute(lemmas_with_meanings, document_id=str(uuid.uuid4()), text=example_text)

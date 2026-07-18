@@ -82,5 +82,8 @@ def get_logger(name: str = None, file_name: str = None):
     if log_config:
         return log_config
 
-    filename = file_name or f"{name}.log"
+    filename = file_name
+    if filename is None:
+        filename = f"{name or __name__}.log"
+
     return LogConfig.default(name, filename)
