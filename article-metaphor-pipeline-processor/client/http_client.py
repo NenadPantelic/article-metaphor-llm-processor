@@ -39,6 +39,7 @@ class HttpClient:
         logger.debug(f"Calling {method} and URL {url}")
         payload = serialize_body(body) if body else None
 
+        # handle requests.exceptions.ConnectionError
         response = None
         match method:
             case HttpMethod.GET:

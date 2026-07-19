@@ -11,7 +11,7 @@ from data.processing_milestone import ProcessingMilestone
 from db.repository.conversation_repository import ConversationRepository
 from exception.invalid_data_exception import InvalidDataException
 from helper.serialization import deserialize_body
-from model.conversation import Conversation
+from model.conversation import Conversation, ConversationBuilder
 from model.processing_data import ProcessingData, LemmasWithExplanations
 from processor.step_processor import StepProcessor
 from util.time_util import utc_now
@@ -22,19 +22,6 @@ _USER_ROLE = "user"
 _NUM_OF_CHARACTERS_PER_PROCESSABLE_TEXT = 1500
 
 log = get_logger()
-
-
-def _reconstruct_text(sentences: list[str] = "", original_text: str = "", offset: int = 0):
-    offset_in_text = offset
-    composed_sentences = []
-    for sentence in sentences:
-        # sentence
-        offset_in_text += len(sentence)
-        composed_sentences.append(sentence + original_text[offset_in_text])
-        # punctuation for the sentence end
-        offset_in_text += 1
-
-    return "".join(composed_sentences)
 
 
 def split_text_into_processable_parts(text: str, lemma_meanings: dict[str, list[str]]) -> list[dict[str, Any]]:
@@ -56,14 +43,14 @@ def split_text_into_processable_parts(text: str, lemma_meanings: dict[str, list[
     # 11 sentences, 4 parts
     sentence_count_per_request = math.ceil(len(sentences) / num_of_parts)
     offset = 0
-    len_of_subtext = 0
 
     subtexts_data_for_analysis = []
     for i in range(num_of_parts):
         sentences_to_process = sentences[offset: offset + sentence_count_per_request]
         offset += sentence_count_per_request
 
-        subtext = _reconstruct_text(sentences_to_process, text, len_of_subtext)
+        subtext = "".join(sentences_to_process)
+        log.debug(f"Subtext: {subtext}")
         subtext_explanations = {
             lemma: explanations for lemma, explanations in lemma_meanings.items() if lemma in subtext
         }
@@ -71,7 +58,6 @@ def split_text_into_processable_parts(text: str, lemma_meanings: dict[str, list[
             "text": subtext,
             "lemmas_meanings": subtext_explanations
         }
-        len_of_subtext += len(subtext)
 
         subtexts_data_for_analysis.append(payload_for_analysis)
 
@@ -119,23 +105,25 @@ class MetaphorAnalysisProcessor(StepProcessor):
         if conversation_id:
             return conversation_id
 
-        response = self._client.responses.create(
-            model=self._assistant_config.model,
-            input=[
+        response = self._client.conversations.create(
+            metadata={"document_id": document_id},
+            items=[
                 {
                     "role": _SYSTEM_ROLE,
-                    "content": self._assistant_config.start_conversation_instruction
+                    "content": self._assistant_config.start_conversation_instruction,
+                    "type": "message",
                 }
             ]
         )
-        conversation_id = response.conversation
+        conversation_id = response.id
         log.info(f"Conversation started: id={conversation_id}")
-
         return self._store_conversation(document_id, conversation_id)
 
     def _store_conversation(self, doc_id: str, conversation_id: str):
         now = utc_now()
-        self._conversation_repository.save_conversation(Conversation(doc_id, conversation_id, now, now))
+        conversation = ConversationBuilder.new_builder().with_document_id(doc_id).with_conversation_id(
+            conversation_id).with_created_at(now).with_updated_at(now).build()
+        self._conversation_repository.save_conversation(conversation)
         self._conversation_cache[doc_id] = conversation_id
         return conversation_id
 
@@ -156,6 +144,7 @@ class MetaphorAnalysisProcessor(StepProcessor):
         prompt_template = self._assistant_config.assistant_prompt_template
         prompt = prompt_template.replace("{{text}}", text).replace("{{lemma_meanings}}", json.dumps(lemma_meanings))
         log.debug(f"Prompt: {prompt}")
+        print(f"Prompt: {prompt}")
         return prompt
 
     def analyze_sentence(self, document_id: str, text: str, lemma_meanings: dict[str, list[str]],
@@ -175,7 +164,6 @@ class MetaphorAnalysisProcessor(StepProcessor):
         response = self._client.responses.create(
             model=self._assistant_config.model,
             conversation=conversation_id,
-            response_format={"type": "json_object"},
             input=[
                 {
                     "role": _USER_ROLE,
@@ -202,7 +190,9 @@ class MetaphorAnalysisProcessor(StepProcessor):
             }
 
         subtexts_data_for_analysis = split_text_into_processable_parts(text, lemma_meanings)
-        for subtext_data in subtexts_data_for_analysis:
-            result = self.analyze_sentence(document_id, subtext_data.get("text"), subtext_data.get("lemma_meanings"),
-                                           True)
+        for i, subtext_data in enumerate(subtexts_data_for_analysis):
+            # maybe to convert to DTO not think about key names
+            result = self.analyze_sentence(document_id, subtext_data.get("text"), subtext_data.get("lemmas_meanings"),
+                                           # TODO - compute or change
+                                           False)
             print("Result:", result)
