@@ -1,4 +1,5 @@
 import abc
+import enum
 from dataclasses import dataclass
 from datetime import datetime
 from typing import Any
@@ -78,3 +79,54 @@ class LemmasWithExplanations(ProcessingData):
         return {
             "explanations": self.lemmas_explanations,
         }
+
+
+class MetaphorType(enum.Enum):
+    DIRECT = "DIRECT"
+    INDIRECT = "INDIRECT"
+    IMPLICIT = "IMPLICIT"
+    NONE = "NONE"
+
+    @staticmethod
+    def of(value):
+        if not value:
+            return None
+
+        for mt in MetaphorType:
+            if mt.name.lower() == value.lower():
+                return mt
+        return None
+
+
+@dataclass
+class MetaphorAnalysis:
+    expression: str
+    position_start: int
+    position_end: int
+    metaphor_type: MetaphorType
+    explanation: str
+
+    def __init__(self, expression: str, position_start: int, position_end: int, metaphor_type: MetaphorType,
+                 explanation: str = None):
+        if position_start > position_end:
+            raise ValueError(f"Position boundaries are not correct: {self.position_start}, {self.position_end}")
+
+        self.expression = expression
+        self.metaphor_type = metaphor_type
+        self.position_start = position_start
+        self.position_end = position_end
+        self.explanation = explanation
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "expression": self.expression,
+            "position_start": self.position_start,
+            "position_end": self.position_end,
+            "metaphor_type": self.metaphor_type.name,
+            "explanation": self.explanation,
+        }
+
+
+@dataclass
+class ArticleMetaphorAnalysis(ProcessingData):
+    metaphors: list[MetaphorAnalysis]
