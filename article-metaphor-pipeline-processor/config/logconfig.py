@@ -2,7 +2,7 @@ import logging
 import sys
 
 DEFAULT_LOGGING_LEVEL = logging.INFO
-DEFAULT_LOGGING_FORMAT = "[%(asctime)s] [%(levelname)s] %(message)s"
+DEFAULT_LOGGING_FORMAT = "%(asctime)s | %(levelname)s | Thread-ID: %(thread)d | %(message)s"
 
 
 class LogConfig:
@@ -86,4 +86,5 @@ def get_logger(name: str = None, file_name: str = None):
     if filename is None:
         filename = f"{name or __name__}.log"
 
-    return LogConfig.default(name, filename)
+    log_config = LogConfig.default(name, filename)
+    return log_config

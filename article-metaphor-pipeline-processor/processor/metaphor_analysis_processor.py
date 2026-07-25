@@ -1,6 +1,8 @@
 import json
 import math
+import random
 import re
+from dataclasses import dataclass
 from typing import Any
 
 from openai import OpenAI
@@ -12,7 +14,8 @@ from db.repository.conversation_repository import ConversationRepository
 from exception.invalid_data_exception import InvalidDataException
 from helper.serialization import deserialize_body
 from model.conversation import Conversation, ConversationBuilder
-from model.processing_data import ProcessingData, LemmasWithExplanations
+from model.processing_data import ProcessingData, LemmasWithExplanations, MetaphorAnalysis, MetaphorType, \
+    ArticleMetaphorAnalysis
 from processor.step_processor import StepProcessor
 from util.time_util import utc_now
 
@@ -24,7 +27,13 @@ _NUM_OF_CHARACTERS_PER_PROCESSABLE_TEXT = 1500
 log = get_logger()
 
 
-def split_text_into_processable_parts(text: str, lemma_meanings: dict[str, list[str]]) -> list[dict[str, Any]]:
+@dataclass
+class ProcessableTextInput:
+    text: str
+    lemmas_explanations: dict[str, list[str]]
+
+
+def split_text_into_processable_parts(text: str, lemma_meanings: dict[str, list[str]]) -> list[ProcessableTextInput]:
     """
     Split text into processable parts based on the num of characters.
     The idea is to divide text into multiple requests not to cross the token limit. Parts will not be 100% equally
@@ -54,14 +63,21 @@ def split_text_into_processable_parts(text: str, lemma_meanings: dict[str, list[
         subtext_explanations = {
             lemma: explanations for lemma, explanations in lemma_meanings.items() if lemma in subtext
         }
-        payload_for_analysis = {
-            "text": subtext,
-            "lemmas_meanings": subtext_explanations
-        }
-
+        payload_for_analysis = ProcessableTextInput(subtext, subtext_explanations)
         subtexts_data_for_analysis.append(payload_for_analysis)
 
     return subtexts_data_for_analysis
+
+
+def _parse_result_to_metaphor_result(analysis_result, offset=0):
+    position = analysis_result.get("position")
+    return MetaphorAnalysis(
+        expression=analysis_result.get("expression"),
+        position_start=offset + position.get("start"),
+        position_end=offset + position.get("end"),
+        metaphor_type=MetaphorType.of(analysis_result.get("metaphor_type")),
+        explanation=analysis_result.get("explanation"),
+    )
 
 
 class MetaphorAnalysisProcessor(StepProcessor):
@@ -144,7 +160,6 @@ class MetaphorAnalysisProcessor(StepProcessor):
         prompt_template = self._assistant_config.assistant_prompt_template
         prompt = prompt_template.replace("{{text}}", text).replace("{{lemma_meanings}}", json.dumps(lemma_meanings))
         log.debug(f"Prompt: {prompt}")
-        print(f"Prompt: {prompt}")
         return prompt
 
     def analyze_sentence(self, document_id: str, text: str, lemma_meanings: dict[str, list[str]],
@@ -177,7 +192,7 @@ class MetaphorAnalysisProcessor(StepProcessor):
 
         return deserialize_body(response.output_text)
 
-    def execute(self, message: LemmasWithExplanations, document_id: str, text: str) -> ProcessingData:
+    def execute(self, message: LemmasWithExplanations, document_id: str, text: str, last_chunk=False) -> ProcessingData:
         if not document_id or not text:
             raise InvalidDataException("Document ID and text are required")
 
@@ -190,9 +205,19 @@ class MetaphorAnalysisProcessor(StepProcessor):
             }
 
         subtexts_data_for_analysis = split_text_into_processable_parts(text, lemma_meanings)
+        metaphor_analysis_results = []
+        offset = 0
+
         for i, subtext_data in enumerate(subtexts_data_for_analysis):
-            # maybe to convert to DTO not think about key names
-            result = self.analyze_sentence(document_id, subtext_data.get("text"), subtext_data.get("lemmas_meanings"),
-                                           # TODO - compute or change
-                                           False)
-            print("Result:", result)
+            text_for_analysis = subtext_data.text
+            analysis = self.analyze_sentence(document_id, text_for_analysis, subtext_data.lemmas_explanations,
+                                             last_chunk)
+
+            for metaphor_result in analysis:
+                metaphor_analysis_results.append(
+                    _parse_result_to_metaphor_result(metaphor_result, offset=offset)
+                )
+
+            offset += len(text_for_analysis)
+
+        return ArticleMetaphorAnalysis(metaphor_analysis_results)
