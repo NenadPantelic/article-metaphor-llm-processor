@@ -130,3 +130,13 @@ class MetaphorAnalysis:
 @dataclass
 class ArticleMetaphorAnalysis(ProcessingData):
     metaphors: list[MetaphorAnalysis]
+
+    def __init__(self, metaphors: list[MetaphorAnalysis] = None, execution_time: datetime = None):
+        super().__init__(execution_time)
+        self.metaphors = metaphors
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "metaphors": [m.to_dict() for m in self.metaphors],
+            "execution_time": self.execution_time,
+        }
