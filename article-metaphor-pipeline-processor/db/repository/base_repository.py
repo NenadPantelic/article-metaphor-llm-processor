@@ -28,9 +28,10 @@ class BaseRepository:
 
     def save(self, query: dict, updated_record: dict):
         log.debug(f"Upserting the {self._entity_name}. Query = {query}, new record = {updated_record}")
+        print(f"Upserting the {self._entity_name}. Query = {query}, new record = {updated_record}")
 
-        update_date = {"$set": updated_record}
-        updated_document = self._collection.find_one_and_update(query, update_date, upsert=True,
+        update_data = {"$set": updated_record}
+        updated_document = self._collection.find_one_and_update(query, update_data, upsert=True,
                                                                 return_document=ReturnDocument.AFTER)
 
         return self._entity_type(**updated_document) if updated_document else None

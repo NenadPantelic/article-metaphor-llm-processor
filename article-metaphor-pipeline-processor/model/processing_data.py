@@ -24,8 +24,8 @@ class ProcessingData(abc.ABC):
 class RawMessage(ProcessingData):
     text: str
 
-    def __init__(self, text: str) -> None:
-        super().__init__()
+    def __init__(self, text: str, execution_time: datetime = None) -> None:
+        super().__init__(execution_time)
         self.text = text
 
     def to_dict(self) -> dict:
@@ -77,7 +77,7 @@ class LemmasWithExplanations(ProcessingData):
 
     def to_dict(self) -> dict[str, Any]:
         return {
-            "explanations": self.lemmas_explanations,
+            "lemmas_explanations": [le.to_dict() for le in self.lemmas_explanations],
         }
 
 
@@ -138,5 +138,44 @@ class ArticleMetaphorAnalysis(ProcessingData):
     def to_dict(self) -> dict[str, Any]:
         return {
             "metaphors": [m.to_dict() for m in self.metaphors],
+            "execution_time": self.execution_time,
+        }
+
+
+@dataclass
+class MetaphorMetadata:
+    metaphor_type: MetaphorType
+    explanation: str
+
+    def to_dict(self):
+        return {
+            "metaphor_type": self.metaphor_type.name,
+            "explanation": self.explanation,
+        }
+
+
+@dataclass
+class AnalyzedTextSegment:
+    text: str
+    metaphor_metadata: MetaphorMetadata
+
+    def to_dict(self):
+        return {
+            "text": self.text,
+            "metaphor_metadata": self.metaphor_metadata.to_dict(),
+        }
+
+
+@dataclass
+class AnalyzedText(ProcessingData):
+    segments: list[AnalyzedTextSegment]
+
+    def __init__(self, segments: list[AnalyzedTextSegment] = None, execution_time: datetime = None):
+        super().__init__(execution_time)
+        self.segments = segments
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "segments": [s.to_dict() for s in self.segments],
             "execution_time": self.execution_time,
         }

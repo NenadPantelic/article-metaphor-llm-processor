@@ -44,16 +44,16 @@ class HttpClient:
         match method:
             case HttpMethod.GET:
                 # TODO: timeouts should be configurable
-                response = self._session.get(url, headers=headers, timeout=10)
+                response = self._session.get(url, headers=headers, timeout=30)
 
             case HttpMethod.POST:
-                response = self._session.post(url, json=payload, headers=headers, timeout=10)
+                response = self._session.post(url, json=payload, headers=headers, timeout=30)
 
             case HttpMethod.PUT:
-                response = self._session.put(url, json=payload, headers=headers, timeout=10)
+                response = self._session.put(url, json=payload, headers=headers, timeout=30)
 
             case HttpMethod.DELETE:
-                response = self._session.delete(url, headers=headers, timeout=10)
+                response = self._session.delete(url, headers=headers, timeout=30)
 
             case _:
                 raise ClientException(f"Unsupported HTTP method: {method}")

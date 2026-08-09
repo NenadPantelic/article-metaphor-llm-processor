@@ -8,17 +8,27 @@ class ReprocessingType(enum.Enum):
 
 
 class PipelineMessage(ABC):
-    def __init__(self, chunk_id: str):
+    def __init__(self, chunk_id: str, order: int, document_id: str):
         self._chunk_id = chunk_id
+        self._order = order
+        self._document_id = document_id
 
     @property
     def chunk_id(self) -> str:
         return self._chunk_id
 
+    @property
+    def order(self) -> int:
+        return self._order
+
+    @property
+    def document_id(self) -> str:
+        return self._document_id
+
 
 class ProcessingMessage(PipelineMessage):
-    def __init__(self, chunk_id: str, text: str):
-        super().__init__(chunk_id)
+    def __init__(self, chunk_id: str, order: int, document_id: str, text: str):
+        super().__init__(chunk_id, order, document_id)
         self._text = text
 
     @property
@@ -27,8 +37,8 @@ class ProcessingMessage(PipelineMessage):
 
 
 class ReprocessingMessage(PipelineMessage):
-    def __init__(self, chunk_id: str, type_of_reprocessing: ReprocessingType):
-        super().__init__(chunk_id)
+    def __init__(self, chunk_id: str, order: int, document_id: str, type_of_reprocessing: ReprocessingType):
+        super().__init__(chunk_id, order, document_id)
         self._type_of_reprocessing = type_of_reprocessing
 
     @property

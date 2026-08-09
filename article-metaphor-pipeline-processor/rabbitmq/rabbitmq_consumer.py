@@ -12,7 +12,6 @@ class RabbitMQConsumer:
         self._channel = self._connection.channel()
 
         self._queue = queue
-
         self._channel.basic_consume(
             queue=self._queue, on_message_callback=self.callback)
 

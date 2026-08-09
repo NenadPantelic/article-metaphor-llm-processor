@@ -88,3 +88,6 @@ def get_logger(name: str = None, file_name: str = None):
 
     log_config = LogConfig.default(name, filename)
     return log_config
+
+
+get_logger(name="article-metaphor-pipeline-processor")

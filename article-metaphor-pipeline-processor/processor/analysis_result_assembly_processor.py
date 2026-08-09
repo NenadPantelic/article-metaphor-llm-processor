@@ -1,23 +1,10 @@
-from dataclasses import dataclass
-
 from config.logconfig import get_logger
 from data.processing_milestone import ProcessingMilestone
-from model.processing_data import ProcessingData, MetaphorType, ArticleMetaphorAnalysis
+from model.processing_data import ProcessingData, ArticleMetaphorAnalysis, AnalyzedTextSegment, MetaphorMetadata, \
+    AnalyzedText
 from processor.step_processor import StepProcessor
 
 log = get_logger()
-
-
-@dataclass
-class MetaphorMetadata:
-    metaphor_type: MetaphorType
-    explanation: str
-
-
-@dataclass
-class AnalyzedTextSegment:
-    text: str
-    metaphor_metadata: MetaphorMetadata
 
 
 def add_missing_position_intervals(positions: list[tuple[int, int]], text_length: int) -> None:
@@ -80,4 +67,4 @@ class AnalysisResultAssemblyProcessor(StepProcessor):
                     metaphor_metadata = MetaphorMetadata(metaphor.metaphor_type, metaphor.explanation)
                     analyzed_text_segments.append(AnalyzedTextSegment(segment_text, metaphor_metadata))
 
-        return analyzed_text_segments
+        return AnalyzedText(analyzed_text_segments)
