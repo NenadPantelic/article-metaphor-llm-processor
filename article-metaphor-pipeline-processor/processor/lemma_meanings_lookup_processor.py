@@ -12,7 +12,7 @@ class LemmaMeaningsLookupProcessor(StepProcessor):
         super().__init__(ProcessingMilestone.LEMMA_MEANING_LOOKUP)
         self._dictionary_access_service = DictionaryAccessService()
 
-    def execute(self, message: LexicalUnitProcessingData) -> LemmasWithExplanations:
+    def execute(self, message: LexicalUnitProcessingData, **kwargs) -> LemmasWithExplanations:
         log.info(f"[lemma-meaning-lookup] Processing {message}")
         lemma_meanings = self._dictionary_access_service.lookup_basic_lemma_meanings(message.unique_lemmas)
 

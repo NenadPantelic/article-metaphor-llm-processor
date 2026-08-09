@@ -60,6 +60,10 @@ _DEFAULT_NAME = "MIPVU Metaphor Annotator"
 _DEFAULT_MODEL = "gpt-4.1-mini"
 _DEFAULT_INSTRUCTIONS = ""
 
+# Processing configuration
+_PROCESSING_SECTION_KEY = "processing"
+_PROCESSING_QUEUE_KEY = "queue"
+
 
 # timeouts
 
@@ -86,7 +90,7 @@ class RabbitMQConfig:
 
     @staticmethod
     def from_config(_config: RawConfigParser):
-        rabbit_section = _config.get_section(_RABBITMQ_SECTION)
+        rabbit_section = _config[_RABBITMQ_SECTION]
 
         host = rabbit_section.get(_RABBITMQ_HOST_KEY)
         port = rabbit_section.getint(_RABBITMQ_PORT_KEY)
@@ -203,3 +207,15 @@ class AssistantConfig:
 
         return AssistantConfig(name=name, model=model, start_conversation_instruction=start_conversation_instruction,
                                assistant_prompt_template=prompt, api_key=api_key)
+
+
+@dataclass
+class ProcessingConfig:
+    queue: str
+
+    @staticmethod
+    def from_config(_config: RawConfigParser):
+        processing_section = _config[_PROCESSING_SECTION_KEY]
+
+        queue = processing_section.get(_PROCESSING_QUEUE_KEY)
+        return ProcessingConfig(queue=queue)

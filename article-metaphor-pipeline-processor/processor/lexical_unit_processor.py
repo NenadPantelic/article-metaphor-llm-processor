@@ -182,7 +182,7 @@ class LexicalUnitProcessor(StepProcessor):
         """
         return sorted({lu["lemma"] for lu in unique_lexical_units})
 
-    def execute(self, message: RawMessage) -> ProcessingData:
+    def execute(self, message: RawMessage, **kwargs) -> ProcessingData:
         text = message.text
         doc = self._nlp(text)
         sentences = self.do_sentence_segmentation(doc)

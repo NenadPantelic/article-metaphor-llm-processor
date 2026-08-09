@@ -1,9 +1,7 @@
 import json
 import math
-import random
 import re
 from dataclasses import dataclass
-from typing import Any
 
 from openai import OpenAI
 
@@ -13,7 +11,7 @@ from data.processing_milestone import ProcessingMilestone
 from db.repository.conversation_repository import ConversationRepository
 from exception.invalid_data_exception import InvalidDataException
 from helper.serialization import deserialize_body
-from model.conversation import Conversation, ConversationBuilder
+from model.conversation import ConversationBuilder
 from model.processing_data import ProcessingData, LemmasWithExplanations, MetaphorAnalysis, MetaphorType, \
     ArticleMetaphorAnalysis
 from processor.step_processor import StepProcessor
