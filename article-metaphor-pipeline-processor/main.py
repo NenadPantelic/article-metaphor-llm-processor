@@ -2,7 +2,7 @@ import uuid
 from config.config import get_config
 from config.logconfig import get_logger
 from config.config_properties import DatabaseConfig, ServiceConfig, LemmaMeaningsCacheConfig, AssistantConfig, \
-    RabbitMQConfig, ProcessingConfig
+    RabbitMQConfig, ProcessingConfig, DictionaryConfig
 from data.processing_milestone import ProcessingMilestone
 from processor.analysis_result_assembly_processor import AnalysisResultAssemblyProcessor
 from processor.pipeline_processor import PipelineProcessor
@@ -13,7 +13,8 @@ logger = get_logger(service_config.name)
 assistant_config = AssistantConfig.from_config(config)
 rmq_config = RabbitMQConfig.from_config(config)
 processing_config = ProcessingConfig.from_config(config)
-# lemma_meanings_cache_config = LemmaMeaningsCacheConfig.from_config(config)
+lemma_meanings_cache_config = LemmaMeaningsCacheConfig.from_config(config)
+dictionary_config = DictionaryConfig.from_config(config)
 
 from db.repository.chunk_processing_state_repository import ChunkProcessingStateRepository
 from db.repository.conversation_repository import ConversationRepository
@@ -36,8 +37,11 @@ if __name__ == "__main__":
     cpsr = ChunkProcessingStateRepository(mongo_client, "chunk_processing_states")
     pipeline_processor = PipelineProcessor(rmq_config, processing_config.queue, cpsr)
 
+    lemma_meanings_cache = LemmaMeaningsCache(lemma_meanings_cache_config)
+    dictionary_access_service = DictionaryAccessService(lemma_meanings_cache, dictionary_config)
+
     lexical_unit_processor = LexicalUnitProcessor()
-    lemma_meaning_lookup_processor = LemmaMeaningsLookupProcessor()
+    lemma_meaning_lookup_processor = LemmaMeaningsLookupProcessor(dictionary_access_service)
     conversation_repository = ConversationRepository(mongo_client, "conversations")
     metaphor_analysis_processor = MetaphorAnalysisProcessor(assistant_config=assistant_config,
                                                             conversation_repository=conversation_repository)

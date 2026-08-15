@@ -37,10 +37,8 @@ _DEFAULT_CACHE_HOST = "127.0.0.1"
 _DEFAULT_CACHE_PORT = 6379
 
 # Lemma meaning cache section/keys
-_LDOCE_SECTION = "ldoce"
-_CAMBRIDGE_SECTION = "cambridge"
-
-_BUCKET_KEY = "cache-key"
+_LDOCE_BUCKET_KEY = "ldoce-cache_key"
+_CAMBRIDGE_BUCKET_KEY = "cambridge-meanings"
 
 # Assistant section/keys and default values
 _ASSISTANT_SECTION = "assistant"
@@ -64,8 +62,11 @@ _DEFAULT_INSTRUCTIONS = ""
 _PROCESSING_SECTION_KEY = "processing"
 _PROCESSING_QUEUE_KEY = "queue"
 
-
-# timeouts
+# dictionary
+_DICTIONARY_SECTION_KEY = "dictionary"
+_DICTIONARY_HTTP_TIMEOUT_KEY = "http-timeout"
+_DICTIONARY_LDOCE_URL_KEY = "ldoce-url"
+_DICTIONARY_CAMBRDIGE_URL_KEY = "cambridge-url"
 
 
 @dataclass
@@ -157,16 +158,18 @@ class LemmaMeaningsCacheConfig(CacheConfig):
 
     @staticmethod
     def from_config(_config):
-        cache_config = CacheConfig.from_config(_config)
+        cache_section = _config[_CACHE_SECTION]
 
-        ldoce_section = _config[_LDOCE_SECTION]
-        ldoce_cache_key = ldoce_section.get(_BUCKET_KEY)
+        host = cache_section.get(_CACHE_HOST_KEY)
+        port = cache_section.getint(_CACHE_PORT_KEY, 0)
+        username = cache_section.get(_CACHE_USERNAME_KEY, _DEFAULT_CACHE_HOST)
+        password = cache_section.get(_CACHE_PASSWORD_KEY, _DEFAULT_CACHE_PORT)
 
-        cambridge_section = _config[_CAMBRIDGE_SECTION]
-        cambridge_cache_key = cambridge_section.get(_BUCKET_KEY)
+        ldoce_cache_key = cache_section.get(_LDOCE_BUCKET_KEY)
+        cambridge_cache_key = cache_section.get(_CAMBRIDGE_BUCKET_KEY)
 
-        return LemmaMeaningsCacheConfig(host=cache_config.host, port=cache_config.port, username=cache_config.username,
-                                        password=cache_config.password, ldoce_cache_key=ldoce_cache_key,
+        return LemmaMeaningsCacheConfig(host=host, port=port, username=username,
+                                        password=password, ldoce_cache_key=ldoce_cache_key,
                                         cambridge_cache_key=cambridge_cache_key)
 
 
@@ -219,3 +222,19 @@ class ProcessingConfig:
 
         queue = processing_section.get(_PROCESSING_QUEUE_KEY)
         return ProcessingConfig(queue=queue)
+
+
+@dataclass
+class DictionaryConfig:
+    timeout: int = 30
+    ldoce_url: str = ""
+    cambridge_url: str = ""
+
+    @staticmethod
+    def from_config(_config: RawConfigParser):
+        dictionary_section = _config[_DICTIONARY_SECTION_KEY]
+
+        timeout = dictionary_section.getint(_DICTIONARY_HTTP_TIMEOUT_KEY, 0)
+        ldoce_url = dictionary_section.get(_DICTIONARY_LDOCE_URL_KEY)
+        cambrdige_url = dictionary_section.get(_DICTIONARY_CAMBRDIGE_URL_KEY)
+        return DictionaryConfig(timeout, ldoce_url, cambrdige_url)

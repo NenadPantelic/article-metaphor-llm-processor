@@ -8,9 +8,9 @@ log = get_logger()
 
 
 class LemmaMeaningsLookupProcessor(StepProcessor):
-    def __init__(self):
+    def __init__(self, dictionary_access_service: DictionaryAccessService = None):
         super().__init__(ProcessingMilestone.LEMMA_MEANING_LOOKUP)
-        self._dictionary_access_service = DictionaryAccessService()
+        self._dictionary_access_service = dictionary_access_service
 
     def execute(self, message: LexicalUnitProcessingData, **kwargs) -> LemmasWithExplanations:
         log.info(f"[lemma-meaning-lookup] Processing {message}")

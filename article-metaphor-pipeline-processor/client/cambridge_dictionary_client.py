@@ -11,9 +11,9 @@ HTML_SELECTOR = ".def.ddef_d.db"
 
 
 class CambridgeDictionaryClient(HttpClient):
-    def __init__(self):
-        super().__init__(scheme="https", host="dictionary.cambridge.org", port="",
-                         api_base_path="dictionary", headers=HEADERS)
+    def __init__(self, url: str = "", http_timeout: int = 30):
+        super().__init__(url=url, scheme="https", host="dictionary.cambridge.org", port="",
+                         api_base_path="dictionary", headers=HEADERS, http_timeout=http_timeout)
 
     def lookup(self, lemma: str) -> List[str]:
         """

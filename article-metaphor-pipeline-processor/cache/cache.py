@@ -1,13 +1,14 @@
 import redis
 
 from config.config_properties import CacheConfig
-from config.logconfig import LogConfig
+from config.logconfig import get_logger
 
-log = LogConfig.default(__name__, __file__)
+log = get_logger()
 
 
 class RedisCache:
     def __init__(self, cache_config: CacheConfig):
+        print("DSDS", cache_config)
         self._cache = redis.Redis(host=cache_config.host,
                                   port=cache_config.port,
                                   username=cache_config.username,

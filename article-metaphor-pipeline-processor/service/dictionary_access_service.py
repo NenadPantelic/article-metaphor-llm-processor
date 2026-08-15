@@ -14,6 +14,7 @@ from typing import List, Dict, Union
 from cache.lemma_meaning_cache import LemmaMeaningsCache
 from client.cambridge_dictionary_client import CambridgeDictionaryClient
 from client.ldoce_dictionary_client import LDOCEDictionaryClient
+from config.config_properties import DictionaryConfig
 from config.logconfig import get_logger
 
 REQUEST_DELAY = 1.0  # seconds
@@ -27,10 +28,12 @@ class DictionaryType(enum.Enum):
 
 
 class DictionaryAccessService:
-    def __init__(self, cache: LemmaMeaningsCache = None):
+    def __init__(self, cache: LemmaMeaningsCache = None, dictionary_config: DictionaryConfig = None):
         super().__init__()
-        self._ldoce_client = LDOCEDictionaryClient()
-        self._cambridge_client = CambridgeDictionaryClient()
+        self._ldoce_client = LDOCEDictionaryClient(url=dictionary_config.ldoce_url,
+                                                   http_timeout=dictionary_config.timeout)
+        self._cambridge_client = CambridgeDictionaryClient(url=dictionary_config.cambridge_url,
+                                                           http_timeout=dictionary_config.timeout)
         self._cache = cache
 
     def _lookup_cambridge(self, lemma: str) -> List[str]:
@@ -41,7 +44,7 @@ class DictionaryAccessService:
         """
         cached_result = self._get_cached_result(lemma, DictionaryType.CAMBRIDGE)
         if cached_result:
-            log.debug("Returning cached result")
+            log.debug(f"Returning Cambridge cached result for {lemma}: {cached_result}")
             return cached_result
 
         meanings = self._cambridge_client.lookup(lemma)
@@ -56,7 +59,7 @@ class DictionaryAccessService:
         """
         cached_result = self._get_cached_result(lemma, DictionaryType.LDOCE)
         if cached_result:
-            log.debug("Returning cached result")
+            log.debug(f"Returning LDOCE cached result for {lemma}: {cached_result}")
             return cached_result
 
         meanings = self._ldoce_client.lookup(lemma)

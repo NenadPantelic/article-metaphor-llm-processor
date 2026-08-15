@@ -14,6 +14,15 @@ class ChunkProcessingError:
     error: str
     executed_at: datetime
     failed_at_milestone: ProcessingMilestone = None
+    reprocessable: bool = False
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "error": self.error,
+            "executed_at": self.executed_at.isoformat(),
+            "failed_at_milestone": self.failed_at_milestone.name if self.failed_at_milestone else None,
+            "reprocessable": self.reprocessable,
+        }
 
 
 @dataclass
@@ -56,7 +65,7 @@ class ChunkProcessingState:
             "last_executed_milestone": self.last_executed_milestone.name if self.last_executed_milestone else None,
             "failed_on_last_execution": self.failed_on_last_execution,
             "data": {k: v.to_dict() for k, v in self.data.items() if v},
-            "errors": self.errors,
+            "errors": [err.to_dict() for err in self.errors],
         }
 
         # if self._id:
