@@ -65,12 +65,13 @@ class PipelineProcessor(RabbitMQConsumer):
     def register_processors(self, milestone: ProcessingMilestone, processors: List[StepProcessor]) -> None:
         self._milestone_processors[milestone] = processors
 
-    def process_pipeline(self, data: dict):
+    def execute_pipeline(self, data: dict):
         chunk_processing_state = self._get_or_create_chunk_processing_state(data)
         milestone = chunk_processing_state.last_executed_milestone
         processors = self._get_processors(milestone)
         key_milestone = (milestone or ProcessingMilestone.STARTED).name
         input_message = chunk_processing_state.data[key_milestone]
+        output_message = None
 
         additional_attrs = {
             "document_id": chunk_processing_state.document_id,
@@ -99,6 +100,8 @@ class PipelineProcessor(RabbitMQConsumer):
 
             input_message = output_message
 
+        return output_message
+
     def _get_or_create_chunk_processing_state(self, data: dict) -> ChunkProcessingState:
         pipeline_message = _try_parsing_pipeline_message(data)
         chunk_id = pipeline_message.chunk_id
@@ -119,7 +122,7 @@ class PipelineProcessor(RabbitMQConsumer):
 
     def callback(self, method, properties, body):
         data = json.loads(body)
-        self.process_pipeline(data)
+        self.execute_pipeline(data)
         self._channel.basic_ack(delivery_tag=method.delivery_tag)
 
     def _get_processors(self, milestone: ProcessingMilestone):

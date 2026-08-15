@@ -1,0 +1,154 @@
+{
+    "analyzed_text": [
+        {
+            "text": "The ",
+            "metaphor_metadata": null
+        },
+        {
+            "text": "economy",
+            "metaphor_metadata": {
+                "metaphor_type": "NONE",
+                "explanation": "Refers literally to the system of trade, production, and wealth described in the dictionaries."
+            }
+        },
+        {
+            "text": " is on ",
+            "metaphor_metadata": null
+        },
+        {
+            "text": "fire",
+            "metaphor_metadata": {
+                "metaphor_type": "INDIRECT",
+                "explanation": "Describes the economy as exceptionally active or successful, contrasting with the basic meaning of physical burning and understood through that comparison."
+            }
+        },
+        {
+            "text": ",",
+            "metaphor_metadata": null
+        },
+        {
+            "text": " investors",
+            "metaphor_metadata": {
+                "metaphor_type": "NONE",
+                "explanation": "Refers literally to people or organizations putting money into something for profit."
+            }
+        },
+        {
+            "text": " are ",
+            "metaphor_metadata": null
+        },
+        {
+            "text": "flooding",
+            "metaphor_metadata": {
+                "metaphor_type": "INDIRECT",
+                "explanation": "Means entering the market in large numbers, understood by comparison with water covering or filling a place."
+            }
+        },
+        {
+            "text": " the ",
+            "metaphor_metadata": null
+        },
+        {
+            "text": "market",
+            "metaphor_metadata": {
+                "metaphor_type": "NONE",
+                "explanation": "Refers literally to financial or commercial buying and selling, a supplied dictionary meaning."
+            }
+        },
+        {
+            "text": ", and ",
+            "metaphor_metadata": null
+        },
+        {
+            "text": "small",
+            "metaphor_metadata": {
+                "metaphor_type": "NONE",
+                "explanation": "Indicates businesses limited in size or activity, directly matching the supplied meanings."
+            }
+        },
+        {
+            "text": " businesses",
+            "metaphor_metadata": {
+                "metaphor_type": "NONE",
+                "explanation": "Refers literally to organizations that produce or sell goods or services."
+            }
+        },
+        {
+            "text": " are ",
+            "metaphor_metadata": null
+        },
+        {
+            "text": "drowning",
+            "metaphor_metadata": {
+                "metaphor_type": "INDIRECT",
+                "explanation": "Means being overwhelmed by a serious financial problem, understood by comparison with being submerged and unable to breathe."
+            }
+        },
+        {
+            "text": " in ",
+            "metaphor_metadata": null
+        },
+        {
+            "text": "debt",
+            "metaphor_metadata": {
+                "metaphor_type": "NONE",
+                "explanation": "Refers literally to money owed by the businesses."
+            }
+        },
+        {
+            "text": ". He ",
+            "metaphor_metadata": null
+        },
+        {
+            "text": "grasped",
+            "metaphor_metadata": {
+                "metaphor_type": "INDIRECT",
+                "explanation": "Means understood the idea, contrasting with and understood through the basic physical meaning of taking and holding something firmly."
+            }
+        },
+        {
+            "text": " the ",
+            "metaphor_metadata": null
+        },
+        {
+            "text": "idea",
+            "metaphor_metadata": {
+                "metaphor_type": "NONE",
+                "explanation": "Refers literally to a thought, suggestion, or understanding in the mind."
+            }
+        },
+        {
+            "text": ", but ",
+            "metaphor_metadata": null
+        },
+        {
+            "text": "things",
+            "metaphor_metadata": {
+                "metaphor_type": "NONE",
+                "explanation": "Refers generally to the situation or events, directly matching the supplied meanings."
+            }
+        },
+        {
+            "text": "spiraled",
+            "metaphor_metadata": {
+                "metaphor_type": "INDIRECT",
+                "explanation": "Means the situation worsened rapidly and uncontrollably, understood by comparison with physical movement in a spiral."
+            }
+        },
+        {
+            "text": " out of ",
+            "metaphor_metadata": null
+        },
+        {
+            "text": "control",
+            "offset": {
+                "metaphor_type": "NONE",
+                "explanation": "Refers to the ability to manage a situation successfully, directly matching the supplied meaning of being out of control."
+            }
+        },
+        {
+            "text": ".",
+            "metaphor_metadata": null
+        }
+    ]
+}
