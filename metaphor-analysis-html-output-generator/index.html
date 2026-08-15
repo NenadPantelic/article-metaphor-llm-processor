@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Annotated Article</title>
+
+    <style>
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background: white;
+            color: #202122;
+            margin: 0;
+        }
+
+        .article {
+            max-width: 850px;
+            margin: 30px auto;
+            padding: 0 25px;
+        }
+
+        h1 {
+            font-family: Georgia, "Times New Roman", serif;
+            font-size: 28px;
+            font-weight: normal;
+            margin-bottom: 8px;
+            border-bottom: 1px solid #a2a9b1;
+            padding-bottom: 8px;
+        }
+
+        p {
+            font-size: 15px;
+            line-height: 1.55;
+            margin: 12px 0;
+        }
+
+        /* Highlighted word */
+        .annotated {
+            position: relative;
+            background: #fff3a6;
+            border-bottom: 1px dotted #555;
+            cursor: help;
+        }
+
+        /* Information popup */
+        .tooltip {
+            position: absolute;
+            z-index: 10;
+
+            width: 280px;
+            left: 50%;
+            bottom: calc(100% + 7px);
+            transform: translateX(-50%);
+
+            background: #fff;
+            border: 1px solid #a2a9b1;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+
+            padding: 10px 12px;
+
+            font-size: 13px;
+            line-height: 1.4;
+            color: #202122;
+
+            opacity: 0;
+            visibility: hidden;
+
+            transition: opacity 0.12s ease;
+        }
+
+        .annotated:hover .tooltip {
+            opacity: 1;
+            visibility: visible;
+        }
+    </style>
+</head>
+
+<body>
+<br><br>
+<div class="article">
+<p>The economy is on 
+        <span class="annotated">
+                    fire
+                    <span class="tooltip">
+                        Describes the economy as exceptionally active or successful, contrasting with the basic meaning of physical burning and understood through that comparison.
+                    </span>
+                </span>
+        , investors are 
+        <span class="annotated">
+                    flooding
+                    <span class="tooltip">
+                        Means entering the market in large numbers, understood by comparison with water covering or filling a place.
+                    </span>
+                </span>
+         the market, and small businesses are 
+        <span class="annotated">
+                    drowning
+                    <span class="tooltip">
+                        Means being overwhelmed by a serious financial problem, understood by comparison with being submerged and unable to breathe.
+                    </span>
+                </span>
+         in debt. He 
+        <span class="annotated">
+                    grasped
+                    <span class="tooltip">
+                        Means understood the idea, contrasting with and understood through the basic physical meaning of taking and holding something firmly.
+                    </span>
+                </span>
+         the idea, but things
+        <span class="annotated">
+                    spiraled
+                    <span class="tooltip">
+                        Means the situation worsened rapidly and uncontrollably, understood by comparison with physical movement in a spiral.
+                    </span>
+                </span>
+         out of control.</p>
+</div>
+
+</body>
+</html>

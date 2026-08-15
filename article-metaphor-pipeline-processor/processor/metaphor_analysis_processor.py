@@ -1,0 +1,222 @@
+import json
+import math
+import re
+from dataclasses import dataclass
+
+from openai import OpenAI
+
+from config.config_properties import AssistantConfig
+from config.logconfig import get_logger
+from data.processing_milestone import ProcessingMilestone
+from db.repository.conversation_repository import ConversationRepository
+from exception.invalid_data_exception import InvalidDataException
+from helper.serialization import deserialize_body
+from model.conversation import ConversationBuilder
+from model.processing_data import ProcessingData, LemmasWithExplanations, MetaphorAnalysis, MetaphorType, \
+    ArticleMetaphorAnalysis
+from processor.step_processor import StepProcessor
+from util.retry_util import retry_openai_request
+from util.time_util import utc_now
+
+_SYSTEM_ROLE = "system"
+_USER_ROLE = "user"
+
+_NUM_OF_CHARACTERS_PER_PROCESSABLE_TEXT = 1500
+
+log = get_logger()
+
+
+@dataclass
+class ProcessableTextInput:
+    text: str
+    lemmas_explanations: dict[str, list[str]]
+
+
+def split_text_into_processable_parts(text: str, lemma_meanings: dict[str, list[str]]) -> list[ProcessableTextInput]:
+    """
+    Split text into processable parts based on the num of characters.
+    The idea is to divide text into multiple requests not to cross the token limit. Parts will not be 100% equally
+    divided, but we will just get the equal number of sentences in them.
+
+    :param text: text to be split
+    :param lemma_meanings: lemma meanings dictionary
+    :return: a list of payloads that will be used to process the text
+    """
+    sentences = re.findall(r'[^.!?]+[.!?]+', text)
+    num_of_parts = math.ceil(len(text) / _NUM_OF_CHARACTERS_PER_PROCESSABLE_TEXT)
+
+    # what if we have only 5 sentences, and we need 10 parts, not very likely to happen
+    num_of_parts = min(num_of_parts, len(sentences))
+
+    # 11 sentences, 4 parts
+    sentence_count_per_request = math.ceil(len(sentences) / num_of_parts)
+    offset = 0
+
+    subtexts_data_for_analysis = []
+    for i in range(num_of_parts):
+        sentences_to_process = sentences[offset: offset + sentence_count_per_request]
+        offset += sentence_count_per_request
+
+        subtext = "".join(sentences_to_process)
+        log.debug(f"Subtext: {subtext}")
+        subtext_explanations = {
+            lemma: explanations for lemma, explanations in lemma_meanings.items() if lemma in subtext
+        }
+        payload_for_analysis = ProcessableTextInput(subtext, subtext_explanations)
+        subtexts_data_for_analysis.append(payload_for_analysis)
+
+    return subtexts_data_for_analysis
+
+
+def _parse_result_to_metaphor_result(analysis_result, offset=0):
+    position = analysis_result.get("position")
+    return MetaphorAnalysis(
+        expression=analysis_result.get("expression"),
+        position_start=offset + position.get("start"),
+        position_end=offset + position.get("end"),
+        metaphor_type=MetaphorType.of(analysis_result.get("metaphor_type")),
+        explanation=analysis_result.get("explanation"),
+    )
+
+
+class MetaphorAnalysisProcessor(StepProcessor):
+    def __init__(self, assistant_config: AssistantConfig, conversation_repository: ConversationRepository):
+        super().__init__(ProcessingMilestone.METAPHOR_ANALYSIS)
+        self._client = OpenAI(api_key=assistant_config.api_key)
+        self._assistant_config = assistant_config
+        self._conversation_repository = conversation_repository
+        self._conversation_cache = self._load_conversations()
+
+    ### Cache methods ###
+    def _load_conversations(self):
+        """
+        Loads conversations into the cache for better performance.
+        :return: None
+        """
+        conversations = self._conversation_repository.find_all_conversations()
+        return {conversation.document_id: conversation.conversation_id for conversation in conversations}
+
+    def _remove_from_cache(self, document_id: str):
+        """
+        Evicts the entry from the cache. This should be called when the last chunk of a document is processed.
+        :param document_id: document id that is a key in the cache
+        :return: None
+        """
+        if document_id in self._conversation_cache:
+            log.info(f"Removing the cache key: {document_id}")
+            self._conversation_cache.pop(document_id)
+
+    def _get_or_create_conversation(self, document_id: str):
+        """
+        Gets or creates a conversation with the given document_id.
+        Conversation is created per document, and multiple chunks of the same document are processed
+        in the same conversation. So, if the conversation for a given document does not exist, it
+        creates a new conversation. Otherwise, it returns an existing conversation.
+
+        :param document_id: document id
+        :return: the conversation id
+        """
+        conversation_id = self._get_conversation(document_id)
+        if conversation_id:
+            return conversation_id
+
+        response = self._client.conversations.create(
+            metadata={"document_id": document_id},
+            items=[
+                {
+                    "role": _SYSTEM_ROLE,
+                    "content": self._assistant_config.start_conversation_instruction,
+                    "type": "message",
+                }
+            ]
+        )
+        conversation_id = response.id
+        log.info(f"Conversation started: id={conversation_id}")
+        return self._store_conversation(document_id, conversation_id)
+
+    def _store_conversation(self, doc_id: str, conversation_id: str):
+        now = utc_now()
+        conversation = ConversationBuilder.new_builder().with_document_id(doc_id).with_conversation_id(
+            conversation_id).with_created_at(now).with_updated_at(now).build()
+        self._conversation_repository.save_conversation(conversation)
+        self._conversation_cache[doc_id] = conversation_id
+        return conversation_id
+
+    def _get_conversation(self, doc_id: str) -> str:
+        conversation_id = self._conversation_cache.get(doc_id)
+        if conversation_id:
+            log.debug("Using cached conversation id", conversation_id)
+            return conversation_id
+
+        conversation = self._conversation_repository.find_by_document_id(doc_id)
+        if conversation:
+            self._conversation_cache[doc_id] = conversation.conversation_id
+            return conversation.conversation_id
+
+        return None
+
+    def _build_prompt(self, text: str, lemma_meanings: dict[str, list[str]]) -> str:
+        prompt_template = self._assistant_config.assistant_prompt_template
+        prompt = prompt_template.replace("{{text}}", text).replace("{{lemma_meanings}}", json.dumps(lemma_meanings))
+        log.debug(f"Prompt: {prompt}")
+        return prompt
+
+    def analyze_sentence(self, document_id: str, text: str, lemma_meanings: dict[str, list[str]],
+                         last_chunk: bool = False) -> dict:
+        """
+        Sends one sentence + LUs into the ongoing conversation.
+        :param document_id: document id
+        :param text: text to be analyzed
+        :param lemma_meanings: lemma meanings (explanations) for lemmas present in text
+        :param last_chunk: boolean indicating if the last chunk of the document is about to be processed
+        :return:
+        """
+        conversation_id = self._get_or_create_conversation(document_id=document_id)
+        response = self.execute_openai_request(conversation_id, self._build_prompt(text, lemma_meanings))
+        if last_chunk:
+            self._remove_from_cache(document_id)
+
+        return deserialize_body(response.output_text)
+
+    @retry_openai_request()
+    def execute_openai_request(self, conversation_id: str, prompt: str):
+        return self._client.responses.create(
+            model=self._assistant_config.model,
+            conversation=conversation_id,
+            input=[
+                {
+                    "role": _USER_ROLE,
+                    "content": prompt
+                }
+            ]
+        )
+
+    def execute(self, message: LemmasWithExplanations, document_id: str, text: str, last_chunk=False) -> ProcessingData:
+        if not document_id or not text:
+            raise InvalidDataException("Document ID and text are required")
+
+        # collect lemma meanings into a dictionary
+        lemma_meanings = {}
+        for le in message.lemmas_explanations:
+            lemma_meanings[le.lemma] = {
+                "ldoce": le.ldoce_explanations,
+                "cambridge": le.cambridge_explanations,
+            }
+
+        subtexts_data_for_analysis = split_text_into_processable_parts(text, lemma_meanings)
+        metaphor_analysis_results = []
+        offset = 0
+
+        for i, subtext_data in enumerate(subtexts_data_for_analysis):
+            text_for_analysis = subtext_data.text
+            analysis = self.analyze_sentence(document_id, text_for_analysis, subtext_data.lemmas_explanations,
+                                             last_chunk)
+
+            for metaphor_result in analysis:
+                metaphor_analysis_results.append(
+                    _parse_result_to_metaphor_result(metaphor_result, offset=offset)
+                )
+
+            offset += len(text_for_analysis)
+
+        return ArticleMetaphorAnalysis(metaphor_analysis_results)
