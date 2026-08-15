@@ -12,7 +12,9 @@ import org.springframework.data.mongodb.core.index.CompoundIndex;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @AllArgsConstructor
@@ -31,6 +33,9 @@ public class IndexedDocument {
 
     @NotBlank
     private String text;
+
+    @Builder.Default
+    private List<AnalyzedTextSegment> analyzedTextSegments = new ArrayList<>();
 
     @NotBlank
     private String origin;

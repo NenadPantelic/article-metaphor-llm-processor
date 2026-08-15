@@ -3,6 +3,8 @@ package com.article.metaphor_llm_processor.common.repository;
 import com.article.metaphor_llm_processor.common.model.IndexedDocument;
 import org.springframework.data.mongodb.repository.Aggregation;
 import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.data.mongodb.repository.Query;
+import org.springframework.data.mongodb.repository.Update;
 
 import java.util.Optional;
 
@@ -23,4 +25,7 @@ public interface IndexedDocumentRepository extends MongoRepository<IndexedDocume
     })
     Optional<IndexedDocument> findOldestEligibleDocumentForReprocessing();
 
+    @Query("{ '_id': ?0 }")
+    @Update("{ '$set': { 'state': ?1 } }")
+    long updateDocumentState(String id, String documentState);
 }

@@ -4,5 +4,6 @@ import java.time.Instant;
 
 public record ChunkProcessingError(String error,
                                    Instant executedAt,
-                                   ProcessingMilestone failedAtMilestone) {
+                                   ProcessingMilestone failedAtMilestone,
+                                   boolean reprocessable) {
 }

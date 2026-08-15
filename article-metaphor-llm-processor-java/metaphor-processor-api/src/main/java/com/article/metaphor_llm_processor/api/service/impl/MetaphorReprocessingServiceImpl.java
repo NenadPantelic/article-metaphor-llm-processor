@@ -18,7 +18,7 @@ import java.util.Optional;
 @Service
 public class MetaphorReprocessingServiceImpl implements MetaphorReprocessingService {
 
-    private static final List<DocumentState> FINAL_STATUSES = List.of(DocumentState.DONE, DocumentState.INCOMPLETE);
+    private static final List<DocumentState> FINAL_STATUSES = List.of(DocumentState.PROCESSED_SUCCESSFULLY, DocumentState.PROCESSED_INCOMPLETE);
     private final IndexedDocumentRepository documentRepository;
     private final IndexedDocumentChunkRepository chunkRepository;
 
