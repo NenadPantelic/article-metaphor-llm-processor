@@ -162,7 +162,7 @@ class AnalyzedTextSegment:
     def to_dict(self):
         return {
             "text": self.text,
-            "metaphor_metadata": self.metaphor_metadata.to_dict(),
+            "metaphor_metadata": self.metaphor_metadata.to_dict() if self.metaphor_metadata else None,
         }
 
 

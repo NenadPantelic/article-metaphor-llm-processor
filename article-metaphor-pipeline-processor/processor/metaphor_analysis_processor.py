@@ -15,6 +15,7 @@ from model.conversation import ConversationBuilder
 from model.processing_data import ProcessingData, LemmasWithExplanations, MetaphorAnalysis, MetaphorType, \
     ArticleMetaphorAnalysis
 from processor.step_processor import StepProcessor
+from util.retry_util import retry_openai_request
 from util.time_util import utc_now
 
 _SYSTEM_ROLE = "system"
@@ -170,25 +171,25 @@ class MetaphorAnalysisProcessor(StepProcessor):
         :param last_chunk: boolean indicating if the last chunk of the document is about to be processed
         :return:
         """
-        # TODO: I need a transformer to combine text + lemma meanings; think about the prompt
-        # TODO: validate sentence_payload
         conversation_id = self._get_or_create_conversation(document_id=document_id)
+        response = self.execute_openai_request(conversation_id, self._build_prompt(text, lemma_meanings))
+        if last_chunk:
+            self._remove_from_cache(document_id)
 
-        response = self._client.responses.create(
+        return deserialize_body(response.output_text)
+
+    @retry_openai_request()
+    def execute_openai_request(self, conversation_id: str, prompt: str):
+        return self._client.responses.create(
             model=self._assistant_config.model,
             conversation=conversation_id,
             input=[
                 {
                     "role": _USER_ROLE,
-                    "content": self._build_prompt(text, lemma_meanings)
+                    "content": prompt
                 }
             ]
         )
-
-        if last_chunk:
-            self._remove_from_cache(document_id)
-
-        return deserialize_body(response.output_text)
 
     def execute(self, message: LemmasWithExplanations, document_id: str, text: str, last_chunk=False) -> ProcessingData:
         if not document_id or not text:

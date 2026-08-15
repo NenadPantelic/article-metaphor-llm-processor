@@ -13,22 +13,30 @@ class LemmaMeaningsCache(RedisCache):
         self._cambridge_cache_key = cache_config.cambridge_cache_key
 
     def set_ldoce_lemma_meanings(self, lemma: str, meanings: list[str]):
-        log.info(f"Setting LDOCE lemma meanings for {lemma}")
+        if not lemma or not meanings:
+            log.info(f"LDOCE: Lemma '{lemma}' has no meanings, the value won't be cached")
+            return
+
+        log.info(f"Setting LDOCE lemma meanings for '{lemma}': {meanings}")
         key = f"{self._ldoce_cache_key}:{lemma}"
         self._cache.rpush(key, *meanings)
 
     def get_ldoce_lemma_meanings(self, lemma: str) -> list[str]:
-        log.info(f"Getting LDOCE lemma meanings for {lemma}")
+        log.info(f"Getting LDOCE lemma meanings for '{lemma}'")
         key = f"{self._ldoce_cache_key}:{lemma}"
         return self._cache.lrange(key, 0, -1)
 
     def set_cambridge_lemma_meanings(self, lemma: str, meanings: list[str]):
-        log.info(f"Setting Cambridge lemma meanings for {lemma}")
+        if not lemma or not meanings:
+            log.info(f"Cambridge: Lemma '{lemma}' has no meanings, the value won't be cached")
+            return
+
+        log.info(f"Setting Cambridge lemma meanings for '{lemma}': {meanings}")
         key = f"{self._cambridge_cache_key}:{lemma}"
         self._cache.rpush(key, *meanings)
 
     def get_cambridge_lemma_meanings(self, lemma: str) -> list[str]:
-        log.info(f"Getting Cambridge lemma meanings for {lemma}")
+        log.info(f"Getting Cambridge lemma meanings for '{lemma}'")
         key = f"{self._cambridge_cache_key}:{lemma}"
         return self._cache.lrange(key, 0, -1)
 

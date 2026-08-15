@@ -11,6 +11,7 @@ from model.chunk_processing_state import ChunkProcessingState, ChunkProcessingEr
 from model.processing_data import RawMessage, ProcessingData
 from processor.step_processor import StepProcessor
 from rabbitmq.rabbitmq_consumer import RabbitMQConsumer
+from util.exception_util import is_error_retryable
 from util.time_util import utc_now
 
 log = get_logger()
@@ -49,9 +50,8 @@ def execute_step(processor: StepProcessor, chunk_id: str, message: ProcessingDat
         output = processor.execute(message, **additional_attrs)
         return output, None
     except Exception as e:
-        raise e
         log.error(f"Processing failed with error: {e}")
-        processing_error = ChunkProcessingError(str(e), utc_now(), processor.milestone)
+        processing_error = ChunkProcessingError(str(e), utc_now(), processor.milestone, is_error_retryable(e))
         return None, processing_error
 
 
@@ -75,7 +75,7 @@ class PipelineProcessor(RabbitMQConsumer):
         additional_attrs = {
             "document_id": chunk_processing_state.document_id,
             "text": chunk_processing_state.text,
-            "last_chunk": chunk_processing_state.order == 3
+            "last_chunk": True
         }
         for processor in processors:
             output_message, error = execute_step(processor, chunk_processing_state.chunk_id, input_message,
