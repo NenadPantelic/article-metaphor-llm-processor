@@ -21,7 +21,6 @@ public interface IndexedDocumentChunkRepository extends MongoRepository<IndexedD
     @Aggregation(pipeline = {"{$match: { 'state': {$in: ['ANOTHER_ATTEMPT_NEEDED', 'PENDING_REPROCESSING']}}}", "{$sort: {'order': 1}}", "{$limit: 1}"})
     Optional<IndexedDocumentChunk> findFirstChunkEligibleForReprocessing();
 
-
     List<IndexedDocumentChunk> findByDocumentId(String documentId);
 
     int countByDocumentId(String documentId);
