@@ -50,10 +50,10 @@ public class MetaphorReprocessingServiceImpl implements MetaphorReprocessingServ
         documentRepository.save(document);
 
         var chunks = chunkRepository.findByDocumentId(documentId);
-        chunks.forEach(chunk -> {
-            chunk.clearAllFailedAttempts();
-            chunk.setState(DocumentChunkState.PENDING_REPROCESSING);
-        });
+//        chunks.forEach(chunk -> {
+//            chunk.clearAllFailedAttempts();
+//            chunk.setState(DocumentChunkState.PENDING_REPROCESSING);
+//        });
         chunkRepository.saveAll(chunks);
     }
 }

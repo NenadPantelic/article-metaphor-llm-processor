@@ -29,7 +29,8 @@ public interface IndexedDocumentChunkRepository extends MongoRepository<IndexedD
     @Query(value = "{'documentId': ?1, 'state': 'COMPLETED'}", count = true)
     int countSuccessfullyProcessedByDocumentId(String documentId);
 
-    @Query(value = "{'state': 'FAILED'}", count = true)
+
+    @Query(value = "{'documentId': ?1,'state': 'FAILED'}", count = true)
     int countProcessingFailuresByDocumentId(String documentId);
 
     @Aggregation(pipeline = {"{$match: { 'documentId': ?0, 'order': {$lt: ?1}}}", "{$project: { 'length': { '$strLenCP': '$text'}}}", "{$group: {'_id': null, 'totalLength': {'$sum': '$length'}}}", "{$project: { 'totalLength': 1, '_id': 0}}"})
