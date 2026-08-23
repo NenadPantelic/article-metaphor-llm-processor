@@ -12,6 +12,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Builder
 @Data
@@ -24,6 +25,10 @@ public class ChunkProcessingState {
     @NotBlank
     @Indexed(name = "chunkId_idx", unique = true)
     private String chunkId;
+
+    private String documentId;
+
+    private Map<String, Object> data;
 
     @NotBlank
     private ProcessingMilestone reachedMilestone;

@@ -21,15 +21,15 @@ public interface IndexedDocumentChunkRepository extends MongoRepository<IndexedD
     @Aggregation(pipeline = {"{$match: { 'state': {$in: ['ANOTHER_ATTEMPT_NEEDED', 'PENDING_REPROCESSING']}}}", "{$sort: {'order': 1}}", "{$limit: 1}"})
     Optional<IndexedDocumentChunk> findFirstChunkEligibleForReprocessing();
 
-
     List<IndexedDocumentChunk> findByDocumentId(String documentId);
 
     int countByDocumentId(String documentId);
 
-    @Query(value = "{'state': 'SUCCESSFULLY_PROCESSED'}", count = true)
+    @Query(value = "{'documentId': ?1, 'state': 'COMPLETED'}", count = true)
     int countSuccessfullyProcessedByDocumentId(String documentId);
 
-    @Query(value = "{'state': 'FAILED_TO_PROCESS'}", count = true)
+
+    @Query(value = "{'documentId': ?1,'state': 'FAILED'}", count = true)
     int countProcessingFailuresByDocumentId(String documentId);
 
     @Aggregation(pipeline = {"{$match: { 'documentId': ?0, 'order': {$lt: ?1}}}", "{$project: { 'length': { '$strLenCP': '$text'}}}", "{$group: {'_id': null, 'totalLength': {'$sum': '$length'}}}", "{$project: { 'totalLength': 1, '_id': 0}}"})

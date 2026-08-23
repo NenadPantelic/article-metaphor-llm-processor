@@ -26,7 +26,6 @@
         <module>article-indexer</module>
         <module>common</module>
         <module>metaphor-processor-api</module>
-        <module>document-processing-state-manager</module>
     </modules>
     <!--    <scm>-->
     <!--        <connection/>-->

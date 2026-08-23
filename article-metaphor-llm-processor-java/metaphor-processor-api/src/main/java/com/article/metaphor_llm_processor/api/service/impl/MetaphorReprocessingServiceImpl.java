@@ -18,7 +18,7 @@ import java.util.Optional;
 @Service
 public class MetaphorReprocessingServiceImpl implements MetaphorReprocessingService {
 
-    private static final List<DocumentState> FINAL_STATUSES = List.of(DocumentState.DONE, DocumentState.INCOMPLETE);
+    private static final List<DocumentState> FINAL_STATUSES = List.of(DocumentState.PROCESSED_SUCCESSFULLY, DocumentState.PROCESSED_INCOMPLETE);
     private final IndexedDocumentRepository documentRepository;
     private final IndexedDocumentChunkRepository chunkRepository;
 
@@ -50,10 +50,10 @@ public class MetaphorReprocessingServiceImpl implements MetaphorReprocessingServ
         documentRepository.save(document);
 
         var chunks = chunkRepository.findByDocumentId(documentId);
-        chunks.forEach(chunk -> {
-            chunk.clearAllFailedAttempts();
-            chunk.setState(DocumentChunkState.PENDING_REPROCESSING);
-        });
+//        chunks.forEach(chunk -> {
+//            chunk.clearAllFailedAttempts();
+//            chunk.setState(DocumentChunkState.PENDING_REPROCESSING);
+//        });
         chunkRepository.saveAll(chunks);
     }
 }
