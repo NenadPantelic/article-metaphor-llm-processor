@@ -44,12 +44,16 @@ class DictionaryAccessService:
         """
         cached_result = self._get_cached_result(lemma, DictionaryType.CAMBRIDGE)
         if cached_result:
-            log.debug(f"Returning Cambridge cached result for {lemma}: {cached_result}")
+            log.info(f"Returning Cambridge cached result for {lemma}: {cached_result}")
             return cached_result
 
-        meanings = self._cambridge_client.lookup(lemma)
-        self._set_cached_result(lemma, meanings, DictionaryType.CAMBRIDGE)
-        return meanings
+        try:
+            meanings = self._cambridge_client.lookup(lemma)
+            self._set_cached_result(lemma, meanings, DictionaryType.CAMBRIDGE)
+            return meanings
+        except Exception as e:
+            log.error(f"Cambridge lookup failed for {lemma}: {e}")
+            return []
 
     def _lookup_ldoce(self, lemma: str) -> List[str]:
         """
@@ -59,7 +63,7 @@ class DictionaryAccessService:
         """
         cached_result = self._get_cached_result(lemma, DictionaryType.LDOCE)
         if cached_result:
-            log.debug(f"Returning LDOCE cached result for {lemma}: {cached_result}")
+            log.info(f"Returning LDOCE cached result for {lemma}: {cached_result}")
             return cached_result
 
         meanings = self._ldoce_client.lookup(lemma)

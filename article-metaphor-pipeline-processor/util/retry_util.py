@@ -133,37 +133,7 @@ def retry_openai_request(
 
             for attempt in range(retries + 1):
                 try:
-                    response = func(*args, **kwargs)
-
-                    if attempt == retries:
-                        logger.error(
-                            "OpenAI client request failed after %d retries: "
-                            "status=%s, url=%s",
-                            retries,
-                            response.status_code,
-                            response.url,
-                        )
-                        return response
-
-                    sleep_for = delay + random.uniform(0, jitter)
-                    logger.warning(
-                        "OpenAI HTTP request failed, retrying: "
-                        "attempt=%d/%d, status=%s, url=%s, "
-                        "retry_in=%.2fs",
-                        attempt + 1,
-                        retries + 1,
-                        response.status_code,
-                        response.url,
-                        sleep_for,
-                    )
-
-                    time.sleep(sleep_for)
-
-                    delay = min(
-                        delay * backoff_multiplier,
-                        max_backoff,
-                    )
-
+                    return func(*args, **kwargs)
                 except (openai.BadRequestError, openai.RateLimitError) as exc:
                     if attempt == retries:
                         logger.exception(

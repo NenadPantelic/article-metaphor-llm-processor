@@ -82,6 +82,7 @@ def _parse_result_to_metaphor_result(analysis_result, offset=0):
 class MetaphorAnalysisProcessor(StepProcessor):
     def __init__(self, assistant_config: AssistantConfig, conversation_repository: ConversationRepository):
         super().__init__(ProcessingMilestone.METAPHOR_ANALYSIS)
+        print(f"API key:{assistant_config.api_key}")
         self._client = OpenAI(api_key=assistant_config.api_key)
         self._assistant_config = assistant_config
         self._conversation_repository = conversation_repository
@@ -195,6 +196,7 @@ class MetaphorAnalysisProcessor(StepProcessor):
         if not document_id or not text:
             raise InvalidDataException("Document ID and text are required")
 
+        log.info(f"Processing a message for document {document_id}")
         # collect lemma meanings into a dictionary
         lemma_meanings = {}
         for le in message.lemmas_explanations:

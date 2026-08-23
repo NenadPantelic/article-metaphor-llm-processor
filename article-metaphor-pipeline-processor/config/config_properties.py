@@ -199,7 +199,6 @@ class AssistantConfig:
         start_conversation_instruction = assistant_section.get(_ASSISTANT_START_CONVERSATION_INSTRUCTION_KEY)
         prompt = assistant_section.get(_ASSISTANT_PROMPT_TEMPLATE_KEY)
         api_key = assistant_section.get(_ASSISTANT_OPEN_API_KEY) or read_env_variable(_OPEN_API_KEY_ENV_VARIABLE)
-
         if not start_conversation_instruction:
             with open(assistant_section.get(_ASSISTANT_START_CONVERSATION_INSTRUCTION_FILE_PATH_KEY), "r") as f:
                 start_conversation_instruction = f.read()
