@@ -11,6 +11,8 @@ public interface ChunkProcessingStateRepository extends MongoRepository<ChunkPro
 
     Optional<ChunkProcessingState> findByChunkId(String chunkId);
 
+    List<ChunkProcessingState> findByDocumentId(String documentId);
+
     @Aggregation(pipeline = {"{$match: {'active': true, $expr: { $gte: [{ $size: 'errors' }, $1] }}", "{$limit: ?2}"})
     List<ChunkProcessingState> findActiveStatesWithTooManyFailures(int numOfFailures, int limit);
 }

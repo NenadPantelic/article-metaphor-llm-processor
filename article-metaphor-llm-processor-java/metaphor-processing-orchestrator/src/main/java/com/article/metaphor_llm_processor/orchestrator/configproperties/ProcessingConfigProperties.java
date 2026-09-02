@@ -3,11 +3,13 @@ package com.article.metaphor_llm_processor.orchestrator.configproperties;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 @ConfigurationProperties(prefix = "processing")
-public record ProcessingConfigProperties(int maxRetry,
+public record ProcessingConfigProperties(int maxAttemptNo,
                                          int intervalInMillis,
                                          int reprocessingIntervalInMillis,
                                          String lexicalUnitProcessingExchange,
                                          String lemmaMeaningLookupProcessingExchange,
-                                         String metaphorAnalysisProcessingExchange) {
+                                         String metaphorAnalysisProcessingExchange,
+                                         int stuckProcessingThresholdInMillis,
+                                         int stuckProcessingBatchSize) {
 
 }

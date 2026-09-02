@@ -23,16 +23,8 @@ spring:
     password: M3T4Ph0841
 
 processing:
-  max-retry: 3
+  max-attempt-no: 3
   interval-in-millis: 60000 # 1 minute
   reprocessing-interval-in-millis: 60000 # 1 minute
-  lexical-unit-processing-exchange: x.lexical-unit-processing
-  lemma-meaning-lookup-processing-exchange: x.lemma-meaning-lookup-processing
-  metaphor-analysis-processing-exchange: x.metaphor-analysis-processing
-
-document-state-manager-client:
-  url: TODO
-  max-retry: 3
-  delay: 1000 # 1s
-  multiplier: 2.0
-  max-delay: 20000 # 20s
+  stuck-processing-threshold-in-millis: 3600000 # 6 hours
+  stuck-processing-batch-size: 100

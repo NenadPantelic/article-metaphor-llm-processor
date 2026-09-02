@@ -40,9 +40,9 @@ public class ChunkProcessingState {
     @Builder.Default
     private List<ChunkProcessingError> errors = new ArrayList<>();
 
-    // if the state record is inactive, it cannot be used in processing
+    // if the state record is active, it means it is in processing
     @Builder.Default
-    private boolean active = true;
+    private boolean inProcessing = true;
 
     @CreatedDate
     private Instant createdAt;
@@ -54,7 +54,11 @@ public class ChunkProcessingState {
         errors.add(error);
     }
 
-    public void deactivate() {
-        setActive(false);
+    public void stopProcessing() {
+        setInProcessing(false);
+    }
+
+    public int getErrorCount() {
+        return errors == null ? 0 : errors.size();
     }
 }

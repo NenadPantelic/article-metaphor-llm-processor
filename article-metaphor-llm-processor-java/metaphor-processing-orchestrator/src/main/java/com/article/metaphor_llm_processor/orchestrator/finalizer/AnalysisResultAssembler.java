@@ -7,6 +7,7 @@ import com.article.metaphor_llm_processor.orchestrator.dto.processing.ArticleMet
 import com.article.metaphor_llm_processor.orchestrator.dto.processing.MetaphorAnalysis;
 import com.article.metaphor_llm_processor.orchestrator.model.ChunkProcessingState;
 import com.article.metaphor_llm_processor.orchestrator.model.ProcessingMilestone;
+import com.article.metaphor_llm_processor.orchestrator.repository.ChunkProcessingStateRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.Pair;
@@ -22,16 +23,18 @@ public class AnalysisResultAssembler {
 
     private final IndexedDocumentRepository documentRepository;
     private final IndexedDocumentChunkRepository chunkRepository;
+    private final ChunkProcessingStateRepository chunkProcessingStateRepository;
 
     public AnalysisResultAssembler(IndexedDocumentRepository documentRepository,
-                                   IndexedDocumentChunkRepository chunkRepository) {
+                                   IndexedDocumentChunkRepository chunkRepository,
+                                   ChunkProcessingStateRepository chunkProcessingStateRepository) {
         this.documentRepository = documentRepository;
         this.chunkRepository = chunkRepository;
+        this.chunkProcessingStateRepository = chunkProcessingStateRepository;
     }
 
     public void assembleAnalysisResults(String documentId) {
-
-        List<ChunkProcessingState> chunkProcessingStates = new ArrayList<>(); // TODO
+        List<ChunkProcessingState> chunkProcessingStates = chunkProcessingStateRepository.findByDocumentId(documentId);
         Optional<IndexedDocument> documentOptional = documentRepository.findById(documentId);
 
         if (documentOptional.isEmpty()) {

@@ -45,7 +45,7 @@ public class StateManager {
         chunkProcessingState.setFailedOnLastExecution(true);
         chunkProcessingState.setLastExecutionTimestamp(now);
         chunkProcessingState.addError(new ChunkProcessingError(errorMessage, now, null));
-        chunkProcessingState.deactivate();
+        chunkProcessingState.stopProcessing();
         chunk.setState(DocumentChunkState.FAILED);
         chunkProcessingStateRepository.save(chunkProcessingState);
         chunkRepository.save(chunk);

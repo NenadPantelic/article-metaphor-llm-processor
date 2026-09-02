@@ -25,7 +25,7 @@ public class StuckProcessingChunksHousekeeper {
     private final IndexedDocumentChunkRepository chunkRepository;
     private final ChunkProcessingStateRepository chunkProcessingStateRepository;
     private final StateManager stateManager;
-    private final int maxProcessingRetries;
+    private final ProcessingConfigProperties processingConfigProperties;
 
     public StuckProcessingChunksHousekeeper(IndexedDocumentChunkRepository chunkRepository,
                                             ChunkProcessingStateRepository chunkProcessingStateRepository,
@@ -34,7 +34,7 @@ public class StuckProcessingChunksHousekeeper {
         this.chunkRepository = chunkRepository;
         this.chunkProcessingStateRepository = chunkProcessingStateRepository;
         this.stateManager = stateManager;
-        this.maxProcessingRetries = processingConfigProperties.maxRetry();
+        this.processingConfigProperties = processingConfigProperties;
     }
 
     @Scheduled(fixedDelayString = "#{@'processing-com.metaphor.llm.processor.configproperties.HousekeepingConfigProperties'.intervalInMillis}")
@@ -42,8 +42,9 @@ public class StuckProcessingChunksHousekeeper {
     public void run() {
         log.info("Housekeeping of stuck chunks in progress...");
 
-        List<IndexedDocumentChunk> chunks = chunkRepository.findStuckChunksInProcessing(
-                100, 100 // TODO
+        List<IndexedDocumentChunk> chunks = chunkRepository.findChunksStuckInProcessing(
+                processingConfigProperties.stuckProcessingThresholdInMillis(),
+                processingConfigProperties.stuckProcessingBatchSize()
         );
 
         Instant now = Instant.now();
@@ -56,20 +57,21 @@ public class StuckProcessingChunksHousekeeper {
                     .chunkId(chunk.getId())
                     .build());
 
-            if (chunkProcessingState.getErrors().size() < maxProcessingRetries) {
+            if (chunkProcessingState.getErrors().size() < processingConfigProperties.maxAttemptNo()) {
                 ChunkProcessingError error = new ChunkProcessingError(
                         PROCESSING_ATTEMPT_TIMEOUT_MESSAGE,
                         now,
-                        chunkProcessingState.getReachedMilestone()
+                        chunkProcessingState.getReachedMilestone(),
+                        true
                 );
                 chunkProcessingState.addError(error);
                 chunkProcessingState.setFailedOnLastExecution(true);
                 chunkProcessingState.setLastExecutionTimestamp(now);
             }
 
-            if (chunkProcessingState.getErrors().size() >= maxProcessingRetries) {
+            if (chunkProcessingState.getErrors().size() >= processingConfigProperties.maxAttemptNo()) {
                 chunk.setState(DocumentChunkState.FAILED);
-                chunkProcessingState.deactivate();
+                chunkProcessingState.stopProcessing();
                 stateManager.updateDocumentIfAllChunksProcessed(chunk.getId(), chunk.getDocumentId());
             } else {
                 chunk.setState(DocumentChunkState.REPROCESSING_NEEDED);

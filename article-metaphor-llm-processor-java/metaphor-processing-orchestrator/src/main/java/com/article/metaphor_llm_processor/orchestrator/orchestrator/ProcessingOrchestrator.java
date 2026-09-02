@@ -75,14 +75,14 @@ public class ProcessingOrchestrator {
             chunkProcessingState.setFailedOnLastExecution(true);
             chunkProcessingState.setLastExecutionTimestamp(now);
             // not possible to retry, all attempts exhausted
-            if (chunkProcessingState.getErrors().size() >= processingConfigProperties.maxRetry()) {
+            if (chunkProcessingState.getErrors().size() >= processingConfigProperties.maxAttemptNo()) {
                 log.warn("Processing attempt exhausted for chunk[id = {}, documentId = {}]",
                         chunk.getId(), chunk.getDocumentId()
                 );
                 chunk.setState(DocumentChunkState.FAILED);
                 chunkRepository.save(chunk);
                 stateManager.updateDocumentIfAllChunksProcessed(chunkId, documentId);
-                chunkProcessingState.deactivate();
+                chunkProcessingState.stopProcessing();
             } else {
                 chunk.setState(DocumentChunkState.REPROCESSING_NEEDED);
                 chunkRepository.save(chunk);

@@ -18,7 +18,7 @@ public interface IndexedDocumentChunkRepository extends MongoRepository<IndexedD
     @Aggregation(pipeline = {"{$match: { 'state': 'PENDING'}}", "{$sort: {'order': 1}}", "{$limit: 1}"})
     Optional<IndexedDocumentChunk> findFirstChunkEligibleForProcessing();
 
-    @Aggregation(pipeline = {"{$match: { 'state': {$in: ['ANOTHER_ATTEMPT_NEEDED', 'PENDING_REPROCESSING']}}}", "{$sort: {'order': 1}}", "{$limit: 1}"})
+    @Aggregation(pipeline = {"{$match: { 'state': {$in: ['REPROCESSING_NEEDED', 'REPROCESSING_REQUESTED']}}}", "{$sort: {'order': 1}}", "{$limit: 1}"})
     Optional<IndexedDocumentChunk> findFirstChunkEligibleForReprocessing();
 
     List<IndexedDocumentChunk> findByDocumentId(String documentId);
@@ -54,6 +54,6 @@ public interface IndexedDocumentChunkRepository extends MongoRepository<IndexedD
 
         // executed: 11:30 - YES
         // executed: 14:00 - NO
-    List<IndexedDocumentChunk> findStuckChunksInProcessing(int tooLongExecutionTimeThreshold, int limit);
+    List<IndexedDocumentChunk> findChunksStuckInProcessing(int tooLongExecutionTimeThreshold, int limit);
 }
 
