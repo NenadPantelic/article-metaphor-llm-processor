@@ -5,12 +5,14 @@ from config.config_properties import RabbitMQConfig
 from config.logconfig import get_logger
 from data.pipeline_message import ProcessingMessage, ReprocessingMessage
 from data.processing_milestone import ProcessingMilestone
+from data.processed_chunk import ProcessedChunk
 from db.repository.chunk_processing_state_repository import ChunkProcessingStateRepository
 from exception.processor_exception import ProcessorException
 from model.chunk_processing_state import ChunkProcessingState, ChunkProcessingError
 from model.processing_data import RawMessage, ProcessingData
 from processor.step_processor import StepProcessor
 from rabbitmq.rabbitmq_consumer import RabbitMQConsumer
+from rabbitmq.rabbitmq_producer import RabbitMQPublisher
 from util.exception_util import is_error_retryable
 from util.time_util import utc_now
 
@@ -57,10 +59,12 @@ def execute_step(processor: StepProcessor, chunk_id: str, message: ProcessingDat
 
 class PipelineProcessor(RabbitMQConsumer):
     def __init__(self, rabbitmq_config: RabbitMQConfig, queue: str,
-                 chunk_processing_state_repository: ChunkProcessingStateRepository):
+                 chunk_processing_state_repository: ChunkProcessingStateRepository,
+                 rmq_publisher: RabbitMQPublisher):
         super().__init__(rabbitmq_config, queue)
         self._chunk_processing_state_repository = chunk_processing_state_repository
         self._milestone_processors = {}
+        self._rmq_publisher = rmq_publisher
 
     def register_processors(self, milestone: ProcessingMilestone, processors: List[StepProcessor]) -> None:
         self._milestone_processors[milestone] = processors
@@ -76,8 +80,8 @@ class PipelineProcessor(RabbitMQConsumer):
         additional_attrs = {
             "document_id": chunk_processing_state.document_id,
             "text": chunk_processing_state.text,
-            "last_chunk": True
         }
+
         for processor in processors:
             output_message, error = execute_step(processor, chunk_processing_state.chunk_id, input_message,
                                                  additional_attrs)
@@ -89,6 +93,8 @@ class PipelineProcessor(RabbitMQConsumer):
                 chunk_processing_state.errors.append(error)
                 chunk_processing_state.failed_on_last_execution = True
                 self._chunk_processing_state_repository.save_chunk_processing_state(chunk_processing_state)
+                processed_chunk = ProcessedChunk(chunk_processing_state.chunk_id, error)
+                self._rmq_publisher.publish(body=processed_chunk)
                 break
             else:
                 log.info(f"Successfully completed milestone {processor.milestone}")
@@ -100,6 +106,8 @@ class PipelineProcessor(RabbitMQConsumer):
 
             input_message = output_message
 
+        processed_chunk = ProcessedChunk(chunk_processing_state.chunk_id, None)
+        self._rmq_publisher.publish(body=processed_chunk)
         return output_message
 
     def _get_or_create_chunk_processing_state(self, data: dict) -> ChunkProcessingState:

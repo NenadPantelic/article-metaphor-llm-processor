@@ -8,7 +8,6 @@ from config.config_properties import DatabaseConfig, ServiceConfig, LemmaMeaning
 from config.logconfig import get_logger
 from data.processing_milestone import ProcessingMilestone
 from model.processing_data import AnalyzedText
-from processor.analysis_result_assembly_processor import AnalysisResultAssemblyProcessor
 from processor.pipeline_processor import PipelineProcessor
 from util.time_util import utc_now
 
@@ -62,19 +61,15 @@ if __name__ == "__main__":
     conversation_repository = ConversationRepository(mongo_client, "conversations")
     metaphor_analysis_processor = MetaphorAnalysisProcessor(assistant_config=assistant_config,
                                                             conversation_repository=conversation_repository)
-    analysis_result_assembly_processor = AnalysisResultAssemblyProcessor()
-
     milestones = [
         ProcessingMilestone.STARTED,
         ProcessingMilestone.LEXICAL_UNIT_PROCESSING,
         ProcessingMilestone.LEMMA_MEANING_LOOKUP,
         ProcessingMilestone.METAPHOR_ANALYSIS,
-        ProcessingMilestone.RESULT_ASSEMBLY
     ]
 
     processors = [
         lexical_unit_processor, lemma_meaning_lookup_processor, metaphor_analysis_processor,
-        analysis_result_assembly_processor
     ]
 
     processor_idx = 0
@@ -163,7 +158,6 @@ if __name__ == "__main__":
             "text": doc_text,
             "analyzed_text": [s.to_dict() for s in analyzed_text.segments],
         }
-        #print(payload)
         with open(f"./output/{fn}.json", "w", encoding="utf-8") as fout:
             ser_data = json.dumps(payload, indent=4)
             fout.write(ser_data)
