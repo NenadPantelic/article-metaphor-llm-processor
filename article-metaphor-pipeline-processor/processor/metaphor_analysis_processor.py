@@ -93,6 +93,7 @@ class MetaphorAnalysisProcessor(StepProcessor):
         Loads conversations into the cache for better performance.
         :return: None
         """
+        # TODO: use Redis with TTL instead
         conversations = self._conversation_repository.find_all_conversations()
         return {conversation.document_id: conversation.conversation_id for conversation in conversations}
 
@@ -161,21 +162,16 @@ class MetaphorAnalysisProcessor(StepProcessor):
         log.debug(f"Prompt: {prompt}")
         return prompt
 
-    def analyze_sentence(self, document_id: str, text: str, lemma_meanings: dict[str, list[str]],
-                         last_chunk: bool = False) -> dict:
+    def analyze_sentence(self, document_id: str, text: str, lemma_meanings: dict[str, list[str]]) -> dict:
         """
         Sends one sentence + LUs into the ongoing conversation.
         :param document_id: document id
         :param text: text to be analyzed
         :param lemma_meanings: lemma meanings (explanations) for lemmas present in text
-        :param last_chunk: boolean indicating if the last chunk of the document is about to be processed
         :return:
         """
         conversation_id = self._get_or_create_conversation(document_id=document_id)
         response = self.execute_openai_request(conversation_id, self._build_prompt(text, lemma_meanings))
-        if last_chunk:
-            self._remove_from_cache(document_id)
-
         return deserialize_body(response.output_text)
 
     @retry_openai_request()
@@ -191,10 +187,11 @@ class MetaphorAnalysisProcessor(StepProcessor):
             ]
         )
 
-    def execute(self, message: LemmasWithExplanations, document_id: str, text: str, last_chunk=False) -> ProcessingData:
+    def execute(self, message: LemmasWithExplanations, document_id: str, text: str) -> ProcessingData:
         if not document_id or not text:
             raise InvalidDataException("Document ID and text are required")
 
+        log.info(f"Processing a message for document {document_id}")
         # collect lemma meanings into a dictionary
         lemma_meanings = {}
         for le in message.lemmas_explanations:
@@ -209,8 +206,7 @@ class MetaphorAnalysisProcessor(StepProcessor):
 
         for i, subtext_data in enumerate(subtexts_data_for_analysis):
             text_for_analysis = subtext_data.text
-            analysis = self.analyze_sentence(document_id, text_for_analysis, subtext_data.lemmas_explanations,
-                                             last_chunk)
+            analysis = self.analyze_sentence(document_id, text_for_analysis, subtext_data.lemmas_explanations)
 
             for metaphor_result in analysis:
                 metaphor_analysis_results.append(

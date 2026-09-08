@@ -1,0 +1,225 @@
+{
+    "text": "Emergency planning\n\nEmergency alert: millions of UK mobile phones to receive test message on Sunday\n\nDevices will vibrate and make a siren sound for 10 seconds at 3pm, with message confirming alert is a test\n\nDan Milmo Global technology editor\n\nSun 7 Sep 2025 15.49 CESTFirst published on Sat 6 Sep 2025 07.00 CEST\n\n\nMillions of mobile phones will vibrate and make a siren sound across the UK on Sunday afternoon during a test of a nationwide emergency alert system.\nHandset users will also receive a message on their screens reminding them the 10-second alert, which will happen at 3pm, is a test. There are about 87m mobile phones in the UK.\n\nThe government has said not all devices will receive the alert, including older phones and those not connected to 4G or 5G networks. The alert will not work on a phone that is switched off or in airplane mode.\nThe 10-second duration has been designed to \u201cbalance the need for comprehensive testing with reducing inconvenience to the public\u201d, according to the government.\nThere has already been some disruption already, however, withthe Glasgow derby between Celtic FC Women and Rangers Women\u2019s FC has been pushed back to 3.05pm on Sunday to accommodate the alert.\nThis week Pat McFadden, a senior cabinet minister, described the system as a \u201cnational fire alarm\u201d that needed regular testing.\nThe UK\u2019s emergency alert system is designed to warn people if there is danger to life nearby, including outbreaks of extreme weather in specific areas. It has been deployed five times since the first test in April 2023, with the largest use in January this year when 4.5 million received an alert during Storm \u00c9owyn.\nThe first non-test use of the system was in Plymouth in February last year when a 500kg second world war bomb was discovered in a back garden \u2013 and safely removed by bomb disposal experts.\nThe government has also published advice for opting out of the alerts, acknowledging that victims of domestic abuse with a concealed phone might want to block the test. However, switching your handset to silent will not prevent the alert.\nThe alert will not sound if users have their phone switched off or if it is on airplane mode. However, if you turn your device back on shortly after the test, you might still receive the alert. The system works by broadcasting from mobile phone masts in a specific area, alerting every phone switched on within that radius \u2013 so tourists with non-UK numbers will also get the alert, for instance.\nThe first alert test on 23 April 2023 did not reach an estimated 7% of devices, according to the Cabinet Office, which nonetheless declared the trial \u201csuccessful\u201d. Some mobile phone users said at that time that their devices had not sounded, with the problem traced to specific networks including Three. The government estimated at the time that 5m phones had been affected.\nA government spokesperson said problems with the last test were \u201call resolved within a week of the test being run\u201d.\nThe National Preparedness Commission, an independent body that promotes policies helping the UK recover from significant shocks, said the test was an important part of the country\u2019s preparations for threats ranging from extreme weather to national security challenges.\nThe NPC\u2019s chair, Toby Harris, said: \u201cGiven what we have got with the strategic defence review, the increasingly volatile and worrying international situation, plus increasingly extreme weather events, the need for this sort of preparedness is becoming even more important.\n",
+    "analyzed_text": [
+        {
+            "text": "Emergency planning\n\nEmergency alert: millions of UK mobile phones to receive test message on Sunday\n\nDevices will vibrate and make a siren sound for 10 seconds at 3pm, with message confirming alert is a test\n\nDan Milmo Global technology editor\n\nSun 7 Sep 2025 15.49 CESTFirst published on Sat 6 Sep 2025 07.00 CEST\n\n\nMillions of mobile phones will vibrate and make a siren sound across the UK on Sunday afternoon during a test of a nationwide emergency alert system.\nHandset users will also receive a message on their screens reminding them the 10-second alert, which will happen at 3pm, is a test. There are about 87m mobile phones in the UK.\n\nThe government has said not all devices will receive the alert, including older phones and those not connected to 4G or 5G networks. The alert will not work on a phone that is switched off or in airplane mode.\nThe 10-second duration has been",
+            "metaphor_metadata": null
+        },
+        {
+            "text": "designed",
+            "metaphor_metadata": {
+                "metaphor_type": "INDIRECT",
+                "explanation": "The duration was intentionally planned for a purpose. This abstract planning is understood through the more concrete meaning of designing something to be made."
+            }
+        },
+        {
+            "text": "d to ",
+            "metaphor_metadata": null
+        },
+        {
+            "text": "balance",
+            "metaphor_metadata": {
+                "metaphor_type": "INDIRECT",
+                "explanation": "The government is weighing two competing considerations. This contextual meaning contrasts with physical balance and is understood through comparison with keeping opposing weights or forces in equilibrium."
+            }
+        },
+        {
+            "text": "e the need for comprehensive testing with reducing inconvenience to the public\u201d, according to the government.\nThere has already been some disruption already, however, withthe Glasgow derby between Celtic FC Women and Rangers Women\u2019s FC has been",
+            "metaphor_metadata": null
+        },
+        {
+            "text": "pushed",
+            "metaphor_metadata": {
+                "metaphor_type": "INDIRECT",
+                "explanation": "The match time was changed rather than physically moved by pressure. The temporal change is understood in terms of physically pushing something in a direction."
+            }
+        },
+        {
+            "text": "back",
+            "metaphor_metadata": {
+                "metaphor_type": "INDIRECT",
+                "explanation": "The word indicates movement of the match to a different time, not physical backward movement. The scheduling change is conceptualized as movement in space."
+            }
+        },
+        {
+            "text": "k to 3.05pm on Sunday to ",
+            "metaphor_metadata": null
+        },
+        {
+            "text": "accommodate",
+            "metaphor_metadata": {
+                "metaphor_type": "INDIRECT",
+                "explanation": "The schedule is adjusted to make provision for the alert. This is understood through the more concrete meaning of providing physical space for someone or something."
+            }
+        },
+        {
+            "text": " the alert.\nThis week Pat McFadden, a senior cabinet minister, described the system as a \u201c",
+            "metaphor_metadata": null
+        },
+        {
+            "text": "national fire alarm",
+            "metaphor_metadata": {
+                "metaphor_type": "DIRECT",
+                "explanation": "The explicit construction described the system as compares the nationwide alert system directly to a fire alarm because both warn people of danger."
+            }
+        },
+        {
+            "text": "\u201d that needed regular testing.\nThe UK\u2019s emergency alert system is designed to warn people if there is danger to life nearby, including ",
+            "metaphor_metadata": null
+        },
+        {
+            "text": "outbreaks",
+            "metaphor_metadata": {
+                "metaphor_type": "INDIRECT",
+                "explanation": "The word refers to extreme weather beginning suddenly. Its basic supplied meaning concerns the sudden start of disease or fighting, which provides a comparison for the weather event."
+            }
+        },
+        {
+            "text": " of extreme weather in specific areas. It has been ",
+            "metaphor_metadata": null
+        },
+        {
+            "text": "deployed",
+            "metaphor_metadata": {
+                "metaphor_type": "INDIRECT",
+                "explanation": "The alert system was put into use. This is understood through the more concrete military meaning of positioning soldiers or equipment so they are ready for use."
+            }
+        },
+        {
+            "text": " five times since the first test in April 2023, with the largest use in January this year when 4.5 million received an alert during Storm \u00c9owyn.\nThe first non-test use of the system was in Plymouth in February last year when a 500kg second world war bomb was discovered in a back garden \u2013 and safely removed by bomb disposal experts.\nThe government has also published advice for opting out of the alerts, acknowledging that victims of domestic abuse with a concealed phone might want to b",
+            "metaphor_metadata": null
+        },
+        {
+            "text": "block",
+            "metaphor_metadata": {
+                "metaphor_type": "INDIRECT",
+                "explanation": "The phone's user would prevent the test alert from being received. This nonphysical prevention is understood in terms of physically obstructing movement through a space."
+            }
+        },
+        {
+            "text": "the test. However, switching your handset to silent will not prevent the alert.\nThe alert will not sound if users have their phone switched off or if it is on airplane mode. However, if you turn your device ",
+            "metaphor_metadata": null
+        },
+        {
+            "text": "back",
+            "metaphor_metadata": {
+                "metaphor_type": "INDIRECT",
+                "explanation": "The device returns to its previous operating condition rather than to a physical place. The change of state is understood as movement back to an earlier position."
+            }
+        },
+        {
+            "text": " on shortly after the test, you might still receive the alert. The system works by broadcasting from mobile phone masts in a specific area, alerting every phone switched on within that radius \u2013 so tourists with non-UK numbers will also get the alert, for instance.\nThe first alert test on 23 April 2023 did not ",
+            "metaphor_metadata": null
+        },
+        {
+            "text": "reach",
+            "metaphor_metadata": {
+                "metaphor_type": "INDIRECT",
+                "explanation": "The alert signal failed to arrive at some devices. Communication with the devices is understood in terms of physical movement toward and arrival at a destination."
+            }
+        },
+        {
+            "text": " an estimated 7% of devices, according to the Cabinet Office, which nonetheless declared the trial \u201csuccessful\u201d. Some mobile phone users said at that time that their devices had not sounded, with the proble",
+            "metaphor_metadata": null
+        },
+        {
+            "text": "traced",
+            "metaphor_metadata": {
+                "metaphor_type": "INDIRECT",
+                "explanation": "Investigators identified the networks as the origin of the problem. Discovering an abstract cause is understood as physically following a trace back to its source."
+            }
+        },
+        {
+            "text": "ed to specific networks including Three. The government estimated at the time that 5m phones had been affected.\nA government spokesperson said problems with the last test were \u201call resolved within a week of the test bei",
+            "metaphor_metadata": null
+        },
+        {
+            "text": "run",
+            "metaphor_metadata": {
+                "metaphor_type": "INDIRECT",
+                "explanation": "The test was conducted or made to operate, not moved quickly on legs. Conducting the test is understood through the more concrete meaning of running."
+            }
+        },
+        {
+            "text": "run\u201d.\nThe National Preparedness Commission, an independ",
+            "metaphor_metadata": null
+        },
+        {
+            "text": "body",
+            "metaphor_metadata": {
+                "metaphor_type": "INDIRECT",
+                "explanation": "The word denotes an organized group of people rather than a physical human or animal structure. The organization is conceptualized as a body."
+            }
+        },
+        {
+            "text": "body that promotes policies helping the",
+            "metaphor_metadata": null
+        },
+        {
+            "text": "recover",
+            "metaphor_metadata": {
+                "metaphor_type": "INDIRECT",
+                "explanation": "The UK is described as returning to normal after serious disruption. National recovery is understood through the more concrete meaning of a person becoming well after illness, injury, or shock."
+            }
+        },
+        {
+            "text": "over from signific",
+            "metaphor_metadata": null
+        },
+        {
+            "text": "shocks",
+            "metaphor_metadata": {
+                "metaphor_type": "INDIRECT",
+                "explanation": "The word refers to sudden disruptive events affecting the country. Their effects are understood in terms of a forceful physical impact or shock."
+            }
+        },
+        {
+            "text": "ocks, said the test was an import",
+            "metaphor_metadata": null
+        },
+        {
+            "text": "part",
+            "metaphor_metadata": {
+                "metaphor_type": "INDIRECT",
+                "explanation": "The test is one abstract component of the country's preparations. This relationship is understood through the concrete whole-part relation between an object and its pieces."
+            }
+        },
+        {
+            "text": "part of the country\u2019s preparations for threats ranging f",
+            "metaphor_metadata": null
+        },
+        {
+            "text": "extreme",
+            "metaphor_metadata": {
+                "metaphor_type": "INDIRECT",
+                "explanation": "The word means unusually severe weather. Its degree is understood spatially as being at the furthest possible point."
+            }
+        },
+        {
+            "text": "reme weather to national security challenges.\nThe NPC\u2019s chair, Toby Harris, said: \u201cGiven what we have got with the strategic defence review, the increasin",
+            "metaphor_metadata": null
+        },
+        {
+            "text": "volatile",
+            "metaphor_metadata": {
+                "metaphor_type": "INDIRECT",
+                "explanation": "The international situation is likely to change suddenly and unpredictably. This is understood through the more concrete property of a substance that changes easily into gas."
+            }
+        },
+        {
+            "text": "tile and worrying international situation, plus increasin",
+            "metaphor_metadata": null
+        },
+        {
+            "text": "extreme",
+            "metaphor_metadata": {
+                "metaphor_type": "INDIRECT",
+                "explanation": "The word describes weather events as unusually severe. Their high degree is conceptualized as being at a spatial extreme or furthest point."
+            }
+        },
+        {
+            "text": "reme weather events, the need for this sort of preparedness is becoming even more important.\n",
+            "metaphor_metadata": null
+        }
+    ]
+}

@@ -77,7 +77,6 @@
 </head>
 
 <body>
-<br><br>
 <div class="article">
 $$$ARTICLE_TEXT$$$
 </div>

@@ -61,7 +61,7 @@ class LogConfig:
         file_formatter = logging.Formatter(self._file_format)
         file_handler.setFormatter(file_formatter)
 
-        logger.addHandler(console_handler)
+        #logger.addHandler(console_handler)
         logger.addHandler(file_handler)
 
         return logger
